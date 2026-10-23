@@ -47,3 +47,4 @@
 - `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` (Group) ➜ ផ្ញើ “ការបញ្ជាទិញជោគជ័យ 💎✅” (User ID, Server ID, itemCode, Game, Item, Amount, Order ID)។
 - `TELEGRAM_CHANNEL_ID` (Channel, ជាជម្រើស) ➜ ផ្ញើ “🧾 វិក័យបត្រ / Invoice” សម្រាប់ Admin មើល។ បើមិនដាក់ Channel វិក័យបត្រចូល Group តែម្តង។
 - ផ្ញើតែម្តងគត់ ពេលស្ថានភាពប្តូរទៅ “បានបង់” (Bakong ស្វ័យប្រវត្តិ ឬ Admin ចុច ✓)។ មិនផ្ញើពេលទើបចុចទិញទេ។
+ 
