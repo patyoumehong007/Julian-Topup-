@@ -1,0 +1,569 @@
+{
+ "telegram": "julian_topup",
+ "rate": 4100,
+ "games": [
+  {
+   "id": "roblox",
+   "short": "Roblox",
+   "name": "Roblox",
+   "region": "GLOBAL",
+   "mono": "RB",
+   "tint": "#B4232C",
+   "unit": "Robux",
+   "unitKm": "Robux",
+   "server": false,
+   "idType": "text",
+   "pop": 2,
+   "packs": [
+    [
+     80,
+     1.05
+    ],
+    [
+     400,
+     5.2
+    ],
+    [
+     800,
+     10.4
+    ],
+    [
+     1700,
+     20.8
+    ],
+    [
+     4500,
+     52
+    ],
+    [
+     10000,
+     104
+    ]
+   ],
+   "vizo": ""
+  },
+  {
+   "id": "mlbb-kh",
+   "short": "MLBB KH",
+   "name": "Mobile Legends",
+   "region": "CAMBODIA",
+   "mono": "ML",
+   "tint": "#5B3FD9",
+   "unit": "Diamonds",
+   "unitKm": "គ្រាប់ពេជ្រ",
+   "server": true,
+   "idType": "num",
+   "pop": 3,
+   "packs": [
+    [
+     86,
+     1.35
+    ],
+    [
+     172,
+     2.65
+    ],
+    [
+     257,
+     3.95
+    ],
+    [
+     344,
+     5.2
+    ],
+    [
+     706,
+     10.4
+    ],
+    [
+     2195,
+     31.5
+    ]
+   ],
+   "vizo": "mlbb"
+  },
+  {
+   "id": "mlbb-ph",
+   "short": "MLBB PH",
+   "name": "Mobile Legends",
+   "region": "PHILIPPINES",
+   "mono": "ML",
+   "tint": "#5B3FD9",
+   "unit": "Diamonds",
+   "unitKm": "គ្រាប់ពេជ្រ",
+   "server": true,
+   "idType": "num",
+   "pop": 3,
+   "packs": [
+    [
+     86,
+     1.35
+    ],
+    [
+     172,
+     2.65
+    ],
+    [
+     257,
+     3.95
+    ],
+    [
+     344,
+     5.2
+    ],
+    [
+     706,
+     10.4
+    ],
+    [
+     2195,
+     31.5
+    ]
+   ],
+   "vizo": "mlbb"
+  },
+  {
+   "id": "mlbb-my",
+   "short": "MLBB MY",
+   "name": "Mobile Legends",
+   "region": "MALAYSIA",
+   "mono": "ML",
+   "tint": "#5B3FD9",
+   "unit": "Diamonds",
+   "unitKm": "គ្រាប់ពេជ្រ",
+   "server": true,
+   "idType": "num",
+   "pop": 3,
+   "packs": [
+    [
+     86,
+     1.35
+    ],
+    [
+     172,
+     2.65
+    ],
+    [
+     257,
+     3.95
+    ],
+    [
+     344,
+     5.2
+    ],
+    [
+     706,
+     10.4
+    ],
+    [
+     2195,
+     31.5
+    ]
+   ],
+   "vizo": "mlbb"
+  },
+  {
+   "id": "mlbb-id",
+   "short": "MLBB ID",
+   "name": "Mobile Legends",
+   "region": "INDONESIA",
+   "mono": "ML",
+   "tint": "#5B3FD9",
+   "unit": "Diamonds",
+   "unitKm": "គ្រាប់ពេជ្រ",
+   "server": true,
+   "idType": "num",
+   "pop": 3,
+   "packs": [
+    [
+     86,
+     1.35
+    ],
+    [
+     172,
+     2.65
+    ],
+    [
+     257,
+     3.95
+    ],
+    [
+     344,
+     5.2
+    ],
+    [
+     706,
+     10.4
+    ],
+    [
+     2195,
+     31.5
+    ]
+   ],
+   "vizo": "mlbb"
+  },
+  {
+   "id": "ff-kh",
+   "short": "Free Fire KH",
+   "name": "Free Fire",
+   "region": "CAMBODIA",
+   "mono": "FF",
+   "tint": "#C2410C",
+   "unit": "Diamonds",
+   "unitKm": "គ្រាប់ពេជ្រ",
+   "server": false,
+   "idType": "num",
+   "pop": 2,
+   "packs": [
+    [
+     100,
+     1.05
+    ],
+    [
+     310,
+     3.1
+    ],
+    [
+     520,
+     5.1
+    ],
+    [
+     1060,
+     10.2
+    ],
+    [
+     2180,
+     20.4
+    ],
+    [
+     5600,
+     50
+    ]
+   ],
+   "vizo": ""
+  },
+  {
+   "id": "ff-tw",
+   "short": "Free Fire TW",
+   "name": "Free Fire",
+   "region": "TW / CHINA",
+   "mono": "FF",
+   "tint": "#C2410C",
+   "unit": "Diamonds",
+   "unitKm": "គ្រាប់ពេជ្រ",
+   "server": false,
+   "idType": "num",
+   "pop": 2,
+   "packs": [
+    [
+     100,
+     1.05
+    ],
+    [
+     310,
+     3.1
+    ],
+    [
+     520,
+     5.1
+    ],
+    [
+     1060,
+     10.2
+    ],
+    [
+     2180,
+     20.4
+    ],
+    [
+     5600,
+     50
+    ]
+   ],
+   "vizo": ""
+  },
+  {
+   "id": "ff-id",
+   "short": "Free Fire ID",
+   "name": "Free Fire",
+   "region": "INDONESIA",
+   "mono": "FF",
+   "tint": "#C2410C",
+   "unit": "Diamonds",
+   "unitKm": "គ្រាប់ពេជ្រ",
+   "server": false,
+   "idType": "num",
+   "pop": 2,
+   "packs": [
+    [
+     100,
+     1.05
+    ],
+    [
+     310,
+     3.1
+    ],
+    [
+     520,
+     5.1
+    ],
+    [
+     1060,
+     10.2
+    ],
+    [
+     2180,
+     20.4
+    ],
+    [
+     5600,
+     50
+    ]
+   ],
+   "vizo": ""
+  },
+  {
+   "id": "pubg",
+   "short": "PUBG Mobile",
+   "name": "PUBG Mobile",
+   "region": "GLOBAL",
+   "mono": "PU",
+   "tint": "#8A5A00",
+   "unit": "UC",
+   "unitKm": "UC",
+   "server": false,
+   "idType": "num",
+   "pop": 2,
+   "packs": [
+    [
+     60,
+     1.05
+    ],
+    [
+     325,
+     5.2
+    ],
+    [
+     660,
+     10.4
+    ],
+    [
+     1800,
+     26
+    ],
+    [
+     3850,
+     52
+    ],
+    [
+     8100,
+     104
+    ]
+   ],
+   "vizo": ""
+  },
+  {
+   "id": "genshin",
+   "short": "Genshin Impact",
+   "name": "Genshin Impact",
+   "region": "GLOBAL",
+   "mono": "GI",
+   "tint": "#0B7A73",
+   "unit": "Genesis Crystals",
+   "unitKm": "គ្រីស្តាល់",
+   "server": true,
+   "idType": "num",
+   "pop": 2,
+   "packs": [
+    [
+     60,
+     1.05
+    ],
+    [
+     330,
+     5.2
+    ],
+    [
+     1090,
+     15.6
+    ],
+    [
+     2240,
+     31.2
+    ],
+    [
+     3880,
+     52
+    ],
+    [
+     8080,
+     104
+    ]
+   ],
+   "vizo": ""
+  },
+  {
+   "id": "magic",
+   "short": "Magic Chess",
+   "name": "Magic Chess",
+   "region": "GLOBAL",
+   "mono": "MC",
+   "tint": "#1F6FB2",
+   "unit": "Diamonds",
+   "unitKm": "គ្រាប់ពេជ្រ",
+   "server": true,
+   "idType": "num",
+   "pop": 3,
+   "packs": [
+    [
+     86,
+     1.35
+    ],
+    [
+     172,
+     2.65
+    ],
+    [
+     257,
+     3.95
+    ],
+    [
+     344,
+     5.2
+    ],
+    [
+     706,
+     10.4
+    ],
+    [
+     2195,
+     31.5
+    ]
+   ],
+   "vizo": ""
+  },
+  {
+   "id": "hok",
+   "short": "Honor of Kings",
+   "name": "Honor of Kings",
+   "region": "GLOBAL",
+   "mono": "HK",
+   "tint": "#A16207",
+   "unit": "Tokens",
+   "unitKm": "Tokens",
+   "server": false,
+   "idType": "num",
+   "pop": 2,
+   "packs": [
+    [
+     80,
+     1.3
+    ],
+    [
+     240,
+     3.85
+    ],
+    [
+     400,
+     6.4
+    ],
+    [
+     800,
+     12.8
+    ],
+    [
+     1200,
+     19.2
+    ],
+    [
+     2400,
+     38.4
+    ]
+   ],
+   "vizo": ""
+  }
+ ],
+ "accounts": [
+  {
+   "game": "mlbb-kh",
+   "title": "Mobile Legends KH — Mythic Glory",
+   "specs": [
+    "Mythic Glory",
+    "120+ Skins",
+    "Epic ស្បែក"
+   ],
+   "usd": 35,
+   "images": []
+  },
+  {
+   "game": "ff-kh",
+   "title": "Free Fire KH — Grandmaster",
+   "specs": [
+    "Grandmaster",
+    "Elite Pass ពេញ",
+    "Bundle កម្រ"
+   ],
+   "usd": 22,
+   "images": []
+  },
+  {
+   "game": "pubg",
+   "title": "PUBG Mobile — Conqueror",
+   "specs": [
+    "Conqueror Season នេះ",
+    "Skin កាំភ្លើងកម្រ"
+   ],
+   "usd": 45,
+   "images": []
+  },
+  {
+   "game": "genshin",
+   "title": "Genshin Impact — AR60",
+   "specs": [
+    "AR 60",
+    "ចរិត ៥★ ១០+",
+    "សព្វាវុធ ៥★"
+   ],
+   "usd": 60,
+   "images": []
+  }
+ ],
+ "khqr": {
+  "account": "",
+  "name": "Julian Topup",
+  "city": "Phnom Penh",
+  "currency": "USD",
+  "expireMin": 15,
+  "mcc": "5999",
+  "merchantId": "",
+  "bank": ""
+ },
+ "pays": [
+  {
+   "name": "KHQR",
+   "desc": "ស្កេនបង់ជាមួយកម្មវិធីធនាគារណាមួយ",
+   "mono": "KH",
+   "tint": "#D0202B"
+  },
+  {
+   "name": "ABA Pay",
+   "desc": "បង់តាមកម្មវិធី ABA Mobile",
+   "mono": "ABA",
+   "tint": "#005E7B"
+  },
+  {
+   "name": "Wing",
+   "desc": "បង់តាមកម្មវិធី Wing",
+   "mono": "W",
+   "tint": "#2F7D32"
+  },
+  {
+   "name": "ACLEDA",
+   "desc": "បង់តាមកម្មវិធី ACLEDA Mobile",
+   "mono": "AC",
+   "tint": "#1F4E9C"
+  }
+ ],
+ "logo": "",
+ "banner": ""
+}
