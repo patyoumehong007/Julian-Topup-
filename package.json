@@ -1,0 +1,7 @@
+{
+  "name": "julian-topup",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Julian Topup — static storefront + Vercel serverless backend (no dependencies)",
+  "engines": { "node": ">=20" }
+}

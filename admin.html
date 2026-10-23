@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Julian Topup — Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Koulen&family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F5FF; --surface:#FFFFFF; --tile:#EBEEFF; --ink:#12153A; --muted:#565C8C; --line:#D5DAF3;
+  --accent:#3355F5; --accent-ink:#FFFFFF; --ok:#15803D; --danger:#C2255C; --shadow:rgba(30,40,120,.14);
+  --pend-bg:#FEF3C7; --pend-fg:#92400E; --paid-bg:#DBEAFE; --paid-fg:#1E40AF;
+  --deliv-bg:#DCFCE7; --deliv-fg:#166534; --canc-bg:#E5E7EB; --canc-fg:#4B5563;
+  --font-display:'Koulen','Noto Sans Khmer',system-ui,sans-serif;
+  --font-body:'Kantumruy Pro','Noto Sans Khmer',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:light dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B0D26; --surface:#141838; --tile:#1C2150; --ink:#EDEFFF; --muted:#A3A9DA; --line:#2B3172;
+    --accent:#7C93FF; --accent-ink:#0B0D26; --ok:#4ADE80; --danger:#FF7BA9; --shadow:rgba(0,0,0,.5);
+    --pend-bg:#4A3308; --pend-fg:#FCD34D; --paid-bg:#1B2A66; --paid-fg:#9DB4FF;
+    --deliv-bg:#0F3A22; --deliv-fg:#86EFAC; --canc-bg:#2A2F45; --canc-fg:#B8BED6;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B0D26; --surface:#141838; --tile:#1C2150; --ink:#EDEFFF; --muted:#A3A9DA; --line:#2B3172;
+  --accent:#7C93FF; --accent-ink:#0B0D26; --ok:#4ADE80; --danger:#FF7BA9; --shadow:rgba(0,0,0,.5);
+  --pend-bg:#4A3308; --pend-fg:#FCD34D; --paid-bg:#1B2A66; --paid-fg:#9DB4FF;
+  --deliv-bg:#0F3A22; --deliv-fg:#86EFAC; --canc-bg:#2A2F45; --canc-fg:#B8BED6;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{color-scheme:light}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:1rem;line-height:1.75;overflow-x:hidden}
+h1,h2,h3,h4,p,dl,dd,ul{margin:0}
+ul{padding:0;list-style:none}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none !important}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.muted{color:var(--muted)}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border:0;cursor:pointer;font-weight:700;white-space:nowrap;background:var(--accent);color:var(--accent-ink);--cut:9px;clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));transition:filter .15s}
+.btn:hover{filter:brightness(1.1)}
+.btn:focus-visible{clip-path:none;border-radius:8px}
+.btn.ghost{background:var(--tile);color:var(--ink)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.small{min-height:36px;padding:0 14px;font-size:.9rem;--cut:7px}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.5;cursor:not-allowed;filter:none}
+.icon-btn{display:inline-grid;place-items:center;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);border-radius:12px;cursor:pointer}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn.plain{border:0;background:transparent}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .icon-btn .sun{display:none}
+  :root:not([data-theme="light"]) .icon-btn .moon{display:block}
+}
+body.ro [data-write]{display:none !important}
+
+/* ---------- layout ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:12px;min-height:62px;padding:0 clamp(14px,3vw,28px);max-width:1240px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;line-height:1}
+.brand svg{width:28px;height:26px;color:var(--accent)}
+.brand em{font-style:normal;font-weight:400;color:var(--muted)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 12px;border-radius:999px;background:var(--tile);font-size:.8rem;font-weight:700;line-height:1.8;white-space:nowrap}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.chip.local i{background:#D97706}
+.chip.ro i{background:var(--danger)}
+.shell{max-width:1240px;margin:0 auto;padding:0 clamp(14px,3vw,28px)}
+main{padding:18px 0 calc(96px + env(safe-area-inset-bottom,0px));outline:none;min-width:0}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:45;display:grid;grid-template-columns:repeat(6,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav button{display:grid;justify-items:center;gap:0;padding:8px 4px 8px;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:.66rem;line-height:1.5;cursor:pointer}
+.nav button svg{width:24px;height:24px}
+.nav button[aria-current="page"]{color:var(--accent)}
+@media (min-width:900px){
+  .shell{display:grid;grid-template-columns:210px minmax(0,1fr);gap:28px;align-items:start}
+  .nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);bottom:auto;left:auto;right:auto;display:grid;grid-template-columns:1fr;gap:4px;margin-top:18px;padding:0;background:transparent;border:0}
+  .nav button{grid-auto-flow:column;justify-content:start;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;font-size:1rem}
+  .nav button[aria-current="page"]{background:var(--surface);box-shadow:0 1px 0 var(--line)}
+  main{padding-bottom:60px}
+}
+
+.page-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin-bottom:16px}
+.page-head h1{font-family:var(--font-display);font-weight:400;font-size:1.7rem;line-height:1.6}
+.page-head .actions{display:flex;flex-wrap:wrap;gap:8px}
+.banner{display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;padding:10px 14px;border-radius:12px;background:var(--pend-bg);color:var(--pend-fg);font-size:.9rem;line-height:1.7}
+.banner.ro{background:color-mix(in srgb,var(--danger) 14%,var(--surface));color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card + .card{margin-top:14px}
+.card h2{font-size:1.1rem;font-weight:700;line-height:1.6}
+.card .sub{margin-top:2px;color:var(--muted);font-size:.9rem;line-height:1.7}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+.empty .btn{margin-top:12px}
+
+/* chips row */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 -2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.fchip{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-weight:600;font-size:.9rem;cursor:pointer}
+.fchip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fchip small{font-size:.78rem;opacity:.8}
+
+/* dashboard */
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+@media (min-width:700px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.kpi{padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.kpi .k-l{color:var(--muted);font-size:.85rem;line-height:1.5}
+.kpi .k-v{margin-top:4px;font-size:1.6rem;font-weight:700;line-height:1.3;font-variant-numeric:tabular-nums}
+.kpi .k-s{color:var(--muted);font-size:.8rem;line-height:1.5}
+.kpi.attn{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.grid2{display:grid;gap:14px;margin-top:14px}
+@media (min-width:900px){.grid2{grid-template-columns:1.4fr 1fr}}
+.grid2 > .card + .card{margin-top:0}
+.chart{width:100%;height:auto;display:block}
+.chart .bar{fill:var(--accent)}
+.chart .bar.zero{fill:var(--line)}
+.chart text{fill:var(--muted);font-size:9px;font-family:var(--font-body)}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.toplist li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;border-top:1px solid var(--line);font-size:.95rem;line-height:1.5}
+.toplist li:first-child{border-top:0}
+.toplist .meter{grid-column:1 / -1;height:6px;border-radius:3px;background:var(--tile);overflow:hidden}
+.toplist .meter i{display:block;height:100%;background:var(--accent)}
+.todo{display:grid;gap:8px}
+.todo-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--tile)}
+.todo-row b{display:block;font-size:.95rem;line-height:1.5}
+.todo-row span{color:var(--muted);font-size:.82rem;line-height:1.5}
+
+/* orders */
+.search{width:100%;min-height:46px;padding:0 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface)}
+.olist{display:grid;gap:10px;margin-top:12px}
+@media (min-width:1100px){.olist{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ocard{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.ocard-main{display:grid;gap:0;text-align:left;border:0;background:none;padding:0;cursor:pointer;min-width:0}
+.oc-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.oc-code{font-size:1rem;letter-spacing:.02em}
+.oc-game{font-weight:600;line-height:1.5}
+.oc-line{color:var(--muted);font-size:.86rem;line-height:1.55;word-break:break-word}
+.oc-time{color:var(--muted);font-size:.78rem;line-height:1.5}
+.badge{display:inline-block;padding:0 10px;border-radius:999px;font-size:.76rem;font-weight:700;line-height:1.7}
+.st-pending{background:var(--pend-bg);color:var(--pend-fg)}
+.st-paid{background:var(--paid-bg);color:var(--paid-fg)}
+.st-delivered{background:var(--deliv-bg);color:var(--deliv-fg)}
+.st-cancelled{background:var(--canc-bg);color:var(--canc-fg)}
+.more{display:block;margin:14px auto 0}
+
+/* products */
+.glist{display:grid;gap:10px}
+.grow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.grow.off{opacity:.6}
+.gtile{display:grid;place-items:center;width:52px;height:52px;border-radius:12px;background:var(--tint);color:#fff;font-family:var(--font-display);font-size:1.25rem;line-height:1}
+.ginfo{display:grid;text-align:left;border:0;background:none;padding:0;cursor:pointer;min-width:0}
+.ginfo b{line-height:1.5}
+.ginfo span{color:var(--muted);font-size:.85rem;line-height:1.5}
+.gctl{display:flex;align-items:center;gap:4px}
+.gctl .icon-btn{width:36px;height:36px;border-radius:10px}
+.gctl .icon-btn svg{width:16px;height:16px}
+.sw{position:relative;display:inline-block;width:46px;height:28px;flex:none}
+.sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.sw span{position:absolute;inset:0;border-radius:999px;background:var(--line);transition:background .15s}
+.sw span::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
+.sw input:checked + span{background:var(--accent)}
+.sw input:checked + span::after{transform:translateX(18px)}
+.sw:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px;border-radius:999px}
+
+/* forms */
+.fld{display:grid;gap:5px}
+.fld label,.fld .lbl{font-weight:600;font-size:.92rem;line-height:1.5}
+.fld input,.fld select,.fld textarea{width:100%;min-height:46px;padding:0 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--tile)}
+.fld textarea{padding:10px 12px;min-height:88px;line-height:1.6;resize:vertical}
+.fld input[type="color"]{padding:4px;min-height:46px}
+.fld input:focus-visible,.fld select:focus-visible,.fld textarea:focus-visible{outline-offset:1px;border-color:var(--accent)}
+.fld .hint{color:var(--muted);font-size:.82rem;line-height:1.6}
+.fld .err{color:var(--danger);font-size:.85rem;font-weight:600}
+.fgrid{display:grid;gap:12px}
+.fld{min-width:0}
+.fld input[type="datetime-local"]{min-width:0;max-width:100%}
+.fgrid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.fgrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.fld[hidden]{display:none}
+.frow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0}
+.frow > span{line-height:1.5}
+.divider{border:0;border-top:1px dashed var(--line);margin:14px 0}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto auto;gap:8px;align-items:center;margin-bottom:8px}
+.prow input[type="number"]{min-height:42px;padding:0 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--tile);width:100%}
+.star{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--tile);cursor:pointer;position:relative;font-size:1.1rem;line-height:1}
+.star input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.star:has(input:checked){background:#FFC94A;color:#3A2800}
+.star:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+.phead{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto auto;gap:8px;margin-bottom:6px;color:var(--muted);font-size:.8rem;line-height:1.4}
+.pays li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.pays li:first-child{border-top:0}
+.pmono{display:grid;place-items:center;width:44px;height:44px;border-radius:10px;background:var(--tint);color:#fff;font-weight:700;font-size:.8rem;line-height:1}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.92rem;line-height:1.6}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;text-align:right;font-weight:600;word-break:break-word}
+.logrow{display:flex;justify-content:space-between;gap:10px;font-size:.82rem;color:var(--muted);line-height:1.6}
+pre.code{margin:0;padding:12px;border-radius:10px;background:var(--tile);font-size:.75rem;line-height:1.5;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto;font-family:ui-monospace,Menlo,Consolas,monospace}
+.qrwrap{display:grid;justify-items:center;gap:8px}
+.qrwrap img{width:min(260px,100%);height:auto;border-radius:12px;background:#fff}
+
+/* images + extra panels */
+.prow,.phead{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px auto auto}
+.pimg{position:relative;width:40px;height:40px}
+.pimg-l{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--tile);cursor:pointer;overflow:hidden;border:1.5px dashed var(--line)}
+.pimg-l:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+.pimg-prev{display:grid;place-items:center;width:100%;height:100%;color:var(--muted);font-weight:700}
+.pimg-prev img{width:100%;height:100%;object-fit:contain}
+.pimg-x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border:0;border-radius:50%;background:var(--danger);color:#fff;font-size:12px;line-height:1;cursor:pointer;display:none;padding:0}
+.pimg.has .pimg-x{display:block}
+.imgrow{display:flex;align-items:center;gap:12px}
+.imgprev{display:grid;place-items:center;width:84px;height:84px;border-radius:12px;background:var(--tile);border:1.5px dashed var(--line);overflow:hidden;flex:none;font-size:.8rem;color:var(--muted)}
+.imgprev.wide{width:150px;height:90px}
+.imgprev img{width:100%;height:100%;object-fit:contain}
+.imgctl{display:flex;flex-wrap:wrap;gap:8px}
+.imgctl label.btn{position:relative}
+.fld input[type="text"][data-imgurl]{min-height:40px;font-size:.88rem}
+.gtile{overflow:hidden}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.th{position:relative;width:76px;height:60px;border-radius:10px;overflow:hidden;background:var(--tile)}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th button{position:absolute;top:2px;right:2px;width:22px;height:22px;border:0;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;cursor:pointer;padding:0}
+.brow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.brow:first-child{border-top:0}
+.bprev{width:108px;height:64px;border-radius:10px;object-fit:cover;background:var(--tile)}
+.pmono{overflow:hidden}
+.pmono img{width:100%;height:100%;object-fit:contain;background:#fff}
+.tgrid{display:grid;gap:12px}
+@media (min-width:700px){.tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sect{font-weight:700;font-size:.95rem;margin:16px 0 8px;color:var(--accent)}
+
+/* sheets */
+dialog{color:var(--ink);background:var(--surface);border:0;padding:0}
+dialog::backdrop{background:rgba(8,10,30,.6)}
+#sheet{width:100%;max-width:560px;max-height:94dvh;margin:auto auto 0;border-radius:24px 24px 0 0;overflow:hidden;box-shadow:0 -10px 40px rgba(0,0,0,.35)}
+#sheet[open]{display:flex;flex-direction:column;animation:sheet-up .26s ease-out}
+@media (min-width:640px){#sheet{margin:auto;border-radius:24px;max-height:90dvh}}
+@keyframes sheet-up{from{transform:translateY(50px);opacity:0}}
+@media (prefers-reduced-motion:reduce){#sheet[open]{animation:none}}
+.sh-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 12px 10px 20px;border-bottom:1px solid var(--line)}
+.sh-head h2{font-family:var(--font-display);font-weight:400;font-size:1.35rem;line-height:1.6;outline:none}
+.sh-body{padding:16px 20px;overflow:auto;flex:1;overscroll-behavior:contain}
+.sh-foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;padding:12px 20px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--surface)}
+.sh-foot .btn{flex:1 1 auto}
+.sh-foot .spacer{flex:1 0 100%;height:0}
+#confirmDlg{width:min(420px,calc(100% - 32px));border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+#confirmDlg .cf{padding:22px;display:grid;gap:14px}
+#confirmDlg .cf h2{font-size:1.15rem;line-height:1.6}
+#confirmDlg .cf div{display:flex;gap:10px;justify-content:flex-end}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);max-width:calc(100% - 32px);padding:10px 18px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:600;font-size:.92rem;line-height:1.6;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.err{background:var(--danger);color:#fff}
+@media (min-width:900px){#toast{bottom:28px}}
+#boot{position:fixed;inset:0;z-index:200;display:grid;place-content:center;justify-items:center;gap:14px;background:var(--bg);color:var(--muted)}
+#boot svg{width:44px;height:40px;color:var(--accent);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.12);opacity:.7}}
+@media (prefers-reduced-motion:reduce){#boot svg{animation:none}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-gem" viewBox="0 0 24 22">
+    <path d="M7 1h10l6 7-11 13L1 8z" fill="currentColor"/>
+    <path d="M1 8h22M7 1l-2 7 7 13M17 1l2 7-7 13M12 1v7" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1"/>
+  </symbol>
+</svg>
+
+<div id="login" hidden style="position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:var(--bg);padding:20px">
+  <div class="card" style="width:min(380px,100%);display:grid;gap:14px">
+    <div class="brand"><svg aria-hidden="true"><use href="#i-gem"/></svg>Julian <em>Admin</em></div>
+    <div class="fld"><label for="lg-pw">ពាក្យសម្ងាត់ Admin</label><input id="lg-pw" type="password" autocomplete="current-password"><div class="err" id="lg-err"></div></div>
+    <button class="btn block" id="lg-go" type="button">ចូល</button>
+  </div>
+</div>
+<div id="boot"><svg aria-hidden="true"><use href="#i-gem"/></svg><p>កំពុងតភ្ជាប់ទិន្នន័យ...</p></div>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-in">
+      <div class="brand"><svg aria-hidden="true"><use href="#i-gem"/></svg>Julian <em>Admin</em></div>
+      <div class="top-actions">
+        <span class="chip" id="modeChip"></span>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="ប្តូរពណ៌ផ្ទាំង">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav class="nav" id="nav" aria-label="ម៉ឺនុយ">
+      <button type="button" data-tab="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>សង្ខេប</button>
+      <button type="button" data-tab="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>បញ្ជាទិញ</button>
+      <button type="button" data-tab="products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>ផលិតផល</button>
+      <button type="button" data-tab="accounts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>គណនី</button>
+      <button type="button" data-tab="look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>រូបភាព</button>
+      <button type="button" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>ការកំណត់</button>
+    </nav>
+    <main id="view" tabindex="-1"></main>
+  </div>
+</div>
+
+<dialog id="sheet" aria-labelledby="shTitle">
+  <div class="sh-head">
+    <h2 id="shTitle" tabindex="-1"></h2>
+    <button class="icon-btn plain" type="button" data-act="closeSheet" aria-label="បិទ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="sh-body" id="shBody"></div>
+  <div class="sh-foot" id="shFoot"></div>
+</dialog>
+
+<dialog id="confirmDlg" aria-labelledby="cfTitle">
+  <div class="cf">
+    <h2 id="cfTitle"></h2>
+    <p class="muted" id="cfText"></p>
+    <div><button class="btn ghost" id="cfNo" type="button">បោះបង់</button><button class="btn danger" id="cfYes" type="button">យល់ព្រម</button></div>
+  </div>
+</dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   Helpers
+   ===================================================================== */
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+var clone = function(x){ return JSON.parse(JSON.stringify(x)); };
+var pad = function(n){ return ('0' + n).slice(-2); };
+function esc(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fmt(n){ return Number(n || 0).toLocaleString('en-US'); }
+function usd(n){ return '$' + Number(n || 0).toFixed(2); }
+function riel(n){ return '៛' + fmt(Math.round(Number(n || 0) * S.cfg.shop.rate / 100) * 100); }
+function fmtDate(ms){ var d = new Date(ms); return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function fmtDateFull(ms){ var d = new Date(ms); return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function toLocalInput(ms){ var d = new Date(ms); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function startOfDay(ts){ var d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); }
+function round2(n){ return Math.round(n * 100) / 100; }
+function slug(t){ return String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40); }
+function genCode(){
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', c = 'JL-';
+  for(var i = 0; i < 6; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
+  return c;
+}
+var toastTimer = null;
+function toast(msg, isErr){
+  var t = $('#toast'); t.textContent = msg; t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.className = ''; }, 2600);
+}
+
+/* =====================================================================
+   Defaults (same data as the storefront)
+   ===================================================================== */
+var PK = {
+  ml:   [[86,1.35],[172,2.65],[257,3.95],[344,5.20],[706,10.40],[2195,31.50]],
+  ff:   [[100,1.05],[310,3.10],[520,5.10],[1060,10.20],[2180,20.40],[5600,50.00]],
+  pubg: [[60,1.05],[325,5.20],[660,10.40],[1800,26.00],[3850,52.00],[8100,104.00]],
+  gi:   [[60,1.05],[330,5.20],[1090,15.60],[2240,31.20],[3880,52.00],[8080,104.00]],
+  rbx:  [[80,1.05],[400,5.20],[800,10.40],[1700,20.80],[4500,52.00],[10000,104.00]],
+  hok:  [[80,1.30],[240,3.85],[400,6.40],[800,12.80],[1200,19.20],[2400,38.40]]
+};
+function G(id, short, name, region, mono, tint, unit, unitKm, server, idType, pop, pk){
+  return {id:id, short:short, name:name, region:region, mono:mono, tint:tint, unit:unit, unitKm:unitKm, server:server, idType:idType, pop:pop, on:true,
+    packs: pk.map(function(x){ return {a:x[0], p:x[1]}; })};
+}
+/* Editable storefront texts: [key, label, default, multiline] */
+var TEXTS = [
+  ['modeTopup','ប៊ូតុង៖ បញ្ចូលគ្រាប់ពេជ្រ','បញ្ចូលគ្រាប់ពេជ្រ'],
+  ['modeAccount','ប៊ូតុង៖ ទិញគណនី','ទិញគណនី'],
+  ['navGames','ម៉ឺនុយ៖ ហ្គេម','ហ្គេម'],
+  ['navAccounts','ម៉ឺនុយ៖ គណនីហ្គេម','គណនីហ្គេម'],
+  ['contactBtn','ប៊ូតុងទាក់ទង (ខាងលើ)','ទាក់ទងយើង'],
+  ['tickerLabel','ស្លាកបញ្ជាទិញថ្មីៗ','បញ្ជាទិញថ្មីៗ'],
+  ['gamesTitle','ប្រអប់ហ្គេម៖ ចំណងជើង','ជ្រើសហ្គេម'],
+  ['gamesSub','ប្រអប់ហ្គេម៖ ពណ៌នា','ចុចលើហ្គេម ដើម្បីមើលតារាងតម្លៃ។'],
+  ['topupBadge','ស្លាកលើកាតហ្គេម','TOPUP'],
+  ['accTitle','ប្រអប់គណនី៖ ចំណងជើង','គណនីហ្គេម'],
+  ['accSub','ប្រអប់គណនី៖ ពណ៌នា','គណនីរៀបចំរួច Rank ខ្ពស់ Skin កម្រ សុវត្ថិភាព ១០០%។',true],
+  ['buyBtn','ប៊ូតុងទិញគណនី','ទិញឥឡូវ'],
+  ['trustTitle','ប្រអប់ទំនុកចិត្ត៖ ចំណងជើង','ទិញដោយទំនុកចិត្ត'],
+  ['f1Title','ប្រអប់ទី ១៖ ចំណងជើង','ដឹកជញ្ជូនរហ័ស'],
+  ['f1Text','ប្រអប់ទី ១៖ អត្ថបទ','ភាគច្រើនចូលគណនីក្នុង ១ ដល់ ៥ នាទី បន្ទាប់ពីបង់ប្រាក់ជោគជ័យ។',true],
+  ['f2Title','ប្រអប់ទី ២៖ ចំណងជើង','តម្លៃច្បាស់លាស់'],
+  ['f2Text','ប្រអប់ទី ២៖ អត្ថបទ','តម្លៃបង្ហាញជាដុល្លារ និងរៀល មុនពេលបង់។ គ្មានថ្លៃលាក់កំបាំង។',true],
+  ['f3Title','ប្រអប់ទី ៣៖ ចំណងជើង','គណនីមានសុវត្ថិភាព'],
+  ['f3Text','ប្រអប់ទី ៣៖ អត្ថបទ','ត្រូវការតែ Player ID។ យើងមិនដែលសុំពាក្យសម្ងាត់ ឬកូដផ្ទៀងផ្ទាត់ទេ។',true],
+  ['step1','ទំព័រតម្លៃ៖ ជំហាន ១','ព័ត៌មានគណនី'],
+  ['step2','ទំព័រតម្លៃ៖ ជំហាន ២','តារាងតម្លៃ'],
+  ['step3','ទំព័រតម្លៃ៖ ជំហាន ៣','វិធីបង់ប្រាក់'],
+  ['popular','ស្លាកកញ្ចប់ពេញនិយម','ពេញនិយម'],
+  ['orderBtn','ប៊ូតុងបញ្ជាទិញ','បញ្ជាទិញ'],
+  ['orderNote','កំណត់ចំណាំក្រោមប៊ូតុងបញ្ជាទិញ','មិនទាន់កាត់ប្រាក់ទេ។ អ្នកនឹងទទួលបានលេខបញ្ជាទិញ សម្រាប់បង់ប្រាក់នៅជំហានបន្ទាប់។',true],
+  ['footer','បាតទំព័រ','© 2026 Julian Topup។ ឈ្មោះហ្គេមជាកម្មសិទ្ធិរបស់ម្ចាស់ពាក្យសម្គាល់រៀងៗខ្លួន។ យើងមិនមែនជាដៃគូផ្លូវការរបស់ក្រុមហ៊ុនហ្គេមទេ។',true]
+];
+var DEF_ACCOUNTS = [
+  {game:'mlbb-kh', title:'Mobile Legends KH — Mythic Glory', specs:['Mythic Glory','120+ Skins','Epic ស្បែក'], usd:35, images:[], on:true},
+  {game:'ff-kh',   title:'Free Fire KH — Grandmaster',       specs:['Grandmaster','Elite Pass ពេញ','Bundle កម្រ'], usd:22, images:[], on:true},
+  {game:'pubg',    title:'PUBG Mobile — Conqueror',          specs:['Conqueror Season នេះ','Skin កាំភ្លើងកម្រ'], usd:45, images:[], on:true},
+  {game:'genshin', title:'Genshin Impact — AR60',            specs:['AR 60','ចរិត ៥★ ១០+','សព្វាវុធ ៥★'], usd:60, images:[], on:true}
+];
+function cleanTexts(t){
+  var out = {}; t = t || {};
+  TEXTS.forEach(function(x){ var v = t[x[0]]; if(v && v !== x[2]) out[x[0]] = v; });
+  return out;
+}
+function bannersOut(){
+  return (S.cfg.banners || []).filter(function(b){ return b.on !== false && b.img; }).map(function(b){ return {img:b.img, game:b.game || '', url:b.url || ''}; });
+}
+function accountsOut(){
+  return (S.cfg.accounts || []).filter(function(a){ return a.on !== false; }).map(function(a){
+    return {game:a.game, title:a.title, specs:a.specs || [], usd:Number(a.usd) || 0, images:a.images || []};
+  });
+}
+function defaultConfig(){
+  return {
+    v: 1,
+    shop: {name:'Julian Topup', telegram:'julian_topup', rate:4100},
+    khqr: {account:'', name:'Julian Topup', city:'Phnom Penh', currency:'USD', expireMin:15, mcc:'5999', merchantId:'', bank:''},
+    ticker: {on:true, count:8},
+    site: {logoTopup:'', logoAccount:'', accent:'', t:{}},
+    banners: [],
+    accounts: clone(DEF_ACCOUNTS),
+    pays: [
+      {id:'khqr',  name:'KHQR',    desc:'ស្កេនបង់ជាមួយកម្មវិធីធនាគារណាមួយ', mono:'KH',  tint:'#D0202B', on:true},
+      {id:'aba',   name:'ABA Pay', desc:'បង់តាមកម្មវិធី ABA Mobile',         mono:'ABA', tint:'#005E7B', on:true},
+      {id:'wing',  name:'Wing',    desc:'បង់តាមកម្មវិធី Wing',               mono:'W',   tint:'#2F7D32', on:true},
+      {id:'acleda',name:'ACLEDA',  desc:'បង់តាមកម្មវិធី ACLEDA Mobile',      mono:'AC',  tint:'#1F4E9C', on:true}
+    ],
+    games: [
+      G('roblox','Roblox','Roblox','GLOBAL','RB','#B4232C','Robux','Robux',false,'text',2,PK.rbx),
+      G('mlbb-kh','MLBB KH','Mobile Legends','CAMBODIA','ML','#5B3FD9','Diamonds','គ្រាប់ពេជ្រ',true,'num',3,PK.ml),
+      G('mlbb-ph','MLBB PH','Mobile Legends','PHILIPPINES','ML','#5B3FD9','Diamonds','គ្រាប់ពេជ្រ',true,'num',3,PK.ml),
+      G('mlbb-my','MLBB MY','Mobile Legends','MALAYSIA','ML','#5B3FD9','Diamonds','គ្រាប់ពេជ្រ',true,'num',3,PK.ml),
+      G('mlbb-id','MLBB ID','Mobile Legends','INDONESIA','ML','#5B3FD9','Diamonds','គ្រាប់ពេជ្រ',true,'num',3,PK.ml),
+      G('ff-kh','Free Fire KH','Free Fire','CAMBODIA','FF','#C2410C','Diamonds','គ្រាប់ពេជ្រ',false,'num',2,PK.ff),
+      G('ff-tw','Free Fire TW','Free Fire','TW / CHINA','FF','#C2410C','Diamonds','គ្រាប់ពេជ្រ',false,'num',2,PK.ff),
+      G('ff-id','Free Fire ID','Free Fire','INDONESIA','FF','#C2410C','Diamonds','គ្រាប់ពេជ្រ',false,'num',2,PK.ff),
+      G('pubg','PUBG Mobile','PUBG Mobile','GLOBAL','PU','#8A5A00','UC','UC',false,'num',2,PK.pubg),
+      G('genshin','Genshin Impact','Genshin Impact','GLOBAL','GI','#0B7A73','Genesis Crystals','គ្រីស្តាល់',true,'num',2,PK.gi),
+      G('magic','Magic Chess','Magic Chess','GLOBAL','MC','#1F6FB2','Diamonds','គ្រាប់ពេជ្រ',true,'num',3,PK.ml),
+      G('hok','Honor of Kings','Honor of Kings','GLOBAL','HK','#A16207','Tokens','Tokens',false,'num',2,PK.hok)
+    ]
+  };
+}
+/* Fill any missing field so old / partial data never breaks the UI */
+function normalizeConfig(c){
+  var d = defaultConfig(); c = c || {};
+  var out = {v:1};
+  out.shop = Object.assign({}, d.shop, c.shop || {});
+  out.khqr = Object.assign({}, d.khqr, c.khqr || {});
+  out.ticker = Object.assign({}, d.ticker, c.ticker || {});
+  out.site = Object.assign({}, d.site, c.site || {});
+  out.site.t = Object.assign({}, (c.site && c.site.t) || {});
+  out.banners = Array.isArray(c.banners) ? c.banners : [];
+  out.accounts = Array.isArray(c.accounts) ? c.accounts : d.accounts;
+  out.accounts.forEach(function(a){ if(a.on == null) a.on = true; a.images = a.images || []; a.specs = a.specs || []; });
+  out.pays = Array.isArray(c.pays) ? c.pays : d.pays;
+  out.games = Array.isArray(c.games) ? c.games : d.games;
+  out.games.forEach(function(g){
+    g.packs = Array.isArray(g.packs) ? g.packs : [];
+    if(g.on == null) g.on = true;
+    if(typeof g.pop !== 'number' || g.pop >= g.packs.length) g.pop = 0;
+  });
+  out.pays.forEach(function(p){ if(p.on == null) p.on = true; });
+  return out;
+}
+
+/* =====================================================================
+   State + storage (shared db inside Claude, localStorage elsewhere)
+   ===================================================================== */
+var S = {mode:'boot', canWrite:true, cfg:normalizeConfig(null), orders:[], tab:'dash', range:'7', ofilter:'all', oq:'', olimit:60, sheet:null};
+
+var LS_CFG = 'jt-admin:config', LS_ORD = 'jt-admin:orders';
+var store = null;
+
+function sortOrders(){ S.orders.sort(function(a, b){ return b.createdAt - a.createdAt; }); }
+
+function makeLocalStore(){
+  function persistOrders(){ try{ localStorage.setItem(LS_ORD, JSON.stringify(S.orders)); }catch(e){ toast('មិនអាចរក្សាទុកក្នុង browser បានទេ', true); } }
+  return {
+    init: function(done){
+      try{ var c = localStorage.getItem(LS_CFG); if(c) S.cfg = normalizeConfig(JSON.parse(c)); }catch(e){}
+      try{ var o = localStorage.getItem(LS_ORD); if(o) S.orders = JSON.parse(o) || []; }catch(e){}
+      sortOrders(); done();
+    },
+    saveConfig: function(cfg){
+      S.cfg = normalizeConfig(clone(cfg));
+      try{ localStorage.setItem(LS_CFG, JSON.stringify(S.cfg)); }catch(e){ toast('មិនអាចរក្សាទុកក្នុង browser បានទេ', true); }
+      return Promise.resolve();
+    },
+    saveOrder: function(o){
+      var i = S.orders.findIndex(function(x){ return x.id === o.id; });
+      if(i >= 0) S.orders[i] = clone(o); else S.orders.push(clone(o));
+      sortOrders(); persistOrders(); return Promise.resolve();
+    },
+    deleteOrder: function(id){
+      S.orders = S.orders.filter(function(x){ return x.id !== id; });
+      persistOrders(); return Promise.resolve();
+    }
+  };
+}
+
+function makeSharedStore(db){
+  var chains = {};
+  function queue(key, fn){
+    var p = (chains[key] || Promise.resolve()).then(fn, fn);
+    chains[key] = p.catch(function(){});
+    return p;
+  }
+  var seeded = false;
+  return {
+    init: function(done){
+      var first = {cfg:false, ord:false}, finished = false;
+      function check(){ if(!finished && first.cfg && first.ord){ finished = true; done(); } }
+      db.doc('config/main').onSnapshot(function(snap){
+        if(snap.exists){ S.cfg = normalizeConfig(clone(snap.data())); }
+        else if(S.canWrite && !seeded){ seeded = true; queue('config/main', function(){ return db.doc('config/main').set(clone(defaultConfig())); }); }
+        first.cfg = true; check(); if(finished) renderAll(true);
+      }, function(e){ first.cfg = true; check(); });
+      db.collection('orders').orderBy('createdAt', 'desc').limit(1000).onSnapshot(function(snap){
+        S.orders = snap.docs.map(function(d){ return clone(d.data()); });
+        first.ord = true; check(); if(finished) renderAll(true);
+      }, function(e){ first.ord = true; check(); });
+    },
+    saveConfig: function(cfg){ return queue('config/main', function(){ return db.doc('config/main').set(clone(cfg)); }); },
+    saveOrder: function(o){ return queue('orders/' + o.id, function(){ return db.doc('orders/' + o.id).set(clone(o)); }); },
+    deleteOrder: function(id){ return queue('orders/' + id, function(){ return db.doc('orders/' + id).delete(); }); }
+  };
+}
+
+function guard(){
+  if(S.canWrite) return true;
+  toast('អ្នកមានសិទ្ធិមើលតែប៉ុណ្ណោះ', true); return false;
+}
+function failMsg(e){
+  if(e && e.msg) return e.msg; var code = e && e.code;
+  if(code === 'quota_exceeded') return 'ទិន្នន័យពេញកំណត់ សូមលុបបញ្ជាទិញចាស់ៗ';
+  if(code === 'invalid_argument') return 'មិនមានសិទ្ធិកែប្រែទិន្នន័យទេ';
+  return 'រក្សាទុកមិនបានទេ សូមព្យាយាមម្តងទៀត';
+}
+/* Every mutation goes through these two */
+function commitConfig(mutator, okMsg){
+  if(!guard()) return Promise.resolve(false);
+  var next = clone(S.cfg); mutator(next);
+  return Promise.resolve(store.saveConfig(next)).then(function(){
+    if(S.mode !== 'shared') renderAll(true);
+    if(okMsg) toast(okMsg); return true;
+  }, function(e){ toast(failMsg(e), true); return false; });
+}
+function commitOrder(o, okMsg){
+  if(!guard()) return Promise.resolve(false);
+  o.updatedAt = Date.now();
+  return Promise.resolve(store.saveOrder(o)).then(function(){
+    if(S.mode !== 'shared') renderAll(true);
+    if(okMsg) toast(okMsg); return true;
+  }, function(e){ toast(failMsg(e), true); return false; });
+}
+function removeOrder(id, okMsg){
+  if(!guard()) return Promise.resolve(false);
+  return Promise.resolve(store.deleteOrder(id)).then(function(){
+    if(S.mode !== 'shared') renderAll(true);
+    if(okMsg) toast(okMsg); return true;
+  }, function(e){ toast(failMsg(e), true); return false; });
+}
+
+/* =====================================================================
+   Domain helpers
+   ===================================================================== */
+var STATUS = {
+  pending:   {label:'រង់ចាំ',        cls:'st-pending'},
+  paid:      {label:'បានបង់',        cls:'st-paid'},
+  delivered: {label:'បានដឹកជញ្ជូន', cls:'st-delivered'},
+  cancelled: {label:'បោះបង់',        cls:'st-cancelled'}
+};
+var STATUS_ORDER = ['pending','paid','delivered','cancelled'];
+function gameById(id){ for(var i = 0; i < S.cfg.games.length; i++) if(S.cfg.games[i].id === id) return S.cfg.games[i]; return null; }
+function gameLabel(o){ return o.gameName ? o.gameName + (o.region ? ' ' + o.region : '') : 'ផ្សេងៗ'; }
+function idText(o){ return o.pid + (o.sid ? ' (Server ' + o.sid + ')' : ''); }
+function isRevenue(o){ return o.status === 'paid' || o.status === 'delivered'; }
+function findOrder(id){ for(var i = 0; i < S.orders.length; i++) if(S.orders[i].id === id) return S.orders[i]; return null; }
+
+function setOrderStatus(id, status, silent){
+  var o = findOrder(id); if(!o) return Promise.resolve(false);
+  var n = clone(o); if(n.status === status) return Promise.resolve(true);
+  n.status = status; n.log = (n.log || []).concat([{s:status, t:Date.now()}]);
+  return commitOrder(n, silent ? null : 'ប្តូរស្ថានភាពទៅ "' + STATUS[status].label + '"');
+}
+function deliveryMessage(o){
+  return 'សួស្តី! បញ្ជាទិញ ' + o.id + ' (' + gameLabel(o) + ' · ' + fmt(o.amount) + ' ' + (o.unit || '') + ') បានដឹកជញ្ជូនចូលគណនី ' +
+    (o.idLabel || 'ID') + ' ' + idText(o) + ' រួចរាល់ហើយ។ សូមចូលហ្គេមពិនិត្យ។ អរគុណដែលបានទិញជាមួយ ' + S.cfg.shop.name + '!';
+}
+
+/* Read the receipt text the storefront gives customers (or the older order message) */
+function parseReceipt(text){
+  var out = {}, lines = String(text).split(/\r?\n/);
+  lines.forEach(function(l){
+    var m = l.match(/^\s*([^:：]+)[:：]\s*(.+?)\s*$/); if(!m) return;
+    var k = m[1].trim(), v = m[2].trim();
+    if(/លេខបញ្ជាទិញ|order/i.test(k)) out.code = v;
+    else if(/ហ្គេម|game/i.test(k)) out.game = v;
+    else if(/^(player id|username|user id)/i.test(k)){ out.pid = v; out.idLabel = k; }
+    else if(/កញ្ចប់|package|item/i.test(k)) out.pack = v;
+    else if(/វិធីបង់|payment|method/i.test(k)) out.method = v;
+    else if(/សរុប|total/i.test(k)) out.total = v;
+    else if(/ស្ថានភាព|status/i.test(k)) out.statusText = v;
+    else if(/ពេលវេលា|time|date/i.test(k)) out.when = v;
+  });
+  if(!out.code){ var cm = String(text).match(/JL-[A-Z0-9]{4,10}/); if(cm) out.code = cm[0]; }
+  if(out.pid){
+    var pm = out.pid.match(/^(\S+?)\s*\(\s*Server\s*(\d+)\s*\)/i);
+    if(pm){ out.pid = pm[1]; out.sid = pm[2]; }
+  }
+  if(out.pack){
+    var km = out.pack.match(/^([\d,.]+)\s*(.*)$/);
+    if(km){ out.amount = Number(km[1].replace(/,/g, '')); out.unit = km[2]; }
+  }
+  if(out.total){
+    var tm = out.total.match(/\$\s*([\d,.]+)/) || out.total.match(/([\d,.]+)\s*USD/i);
+    if(tm) out.usd = Number(tm[1].replace(/,/g, ''));
+  }
+  if(out.statusText){
+    if(/ផ្ទៀងផ្ទាត់/.test(out.statusText) && !/រង់ចាំ/.test(out.statusText)) out.status = 'paid';
+    else out.status = 'pending';
+  }
+  if(out.when){
+    var wm = out.when.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})/);
+    if(wm) out.createdAt = new Date(+wm[3], +wm[2] - 1, +wm[1], +wm[4], +wm[5]).getTime();
+  }
+  if(out.game){
+    var up = out.game.toUpperCase().replace(/\s+/g, ' ');
+    var found = null;
+    S.cfg.games.forEach(function(g){
+      var full = (g.name + ' ' + g.region).toUpperCase();
+      if(!found && (full === up || up.indexOf(full) >= 0)) found = g;
+    });
+    if(found) out.gameId = found.id;
+  }
+  return out;
+}
+
+/* =====================================================================
+   Storefront config (what the admin publishes to the shop)
+   ===================================================================== */
+function maskName(o){
+  var base = (o.customer || o.pid || '').replace(/\s+/g, '');
+  return base ? base.slice(0, 3) + '***' : '***';
+}
+function storefrontConfig(){
+  var c = S.cfg, ticker = [];
+  if(c.ticker.on){
+    ticker = S.orders.filter(function(o){ return isRevenue(o) && !/^DEMO-/.test(o.id); }).slice(0, Math.max(1, Math.min(20, c.ticker.count || 8))).map(function(o){
+      return {n: maskName(o), g: gameLabel(o), p: fmt(o.amount) + ' ' + (o.unit || ''), t: o.createdAt};
+    });
+  }
+  return {
+    v: 1,
+    telegram: c.shop.telegram,
+    rate: c.shop.rate,
+    khqr: {account:c.khqr.account, name:c.khqr.name, city:c.khqr.city, currency:c.khqr.currency, expireMin:c.khqr.expireMin, mcc:c.khqr.mcc, merchantId:c.khqr.merchantId, bank:c.khqr.bank},
+    pays: c.pays.filter(function(p){ return p.on !== false; }).map(function(p){ return {name:p.name, desc:p.desc, mono:p.mono, tint:p.tint, img:p.img || ''}; }),
+    games: c.games.filter(function(g){ return g.on !== false && g.packs.length; }).map(function(g){
+      return {id:g.id, short:g.short, name:g.name, region:g.region, mono:g.mono, tint:g.tint, unit:g.unit, unitKm:g.unitKm,
+        server:!!g.server, idType:g.idType, pop:g.pop, img:g.img || '', packImg:g.packImg || '', packs:g.packs.map(function(p){ return [p.a, p.p, p.img || '']; })};
+    }),
+    ticker: ticker,
+    t: cleanTexts(c.site.t),
+    logoTopup: c.site.logoTopup || '',
+    logoAccount: c.site.logoAccount || '',
+    accent: c.site.accent || '',
+    banners: bannersOut(),
+    accounts: accountsOut()
+  };
+}
+
+/* =====================================================================
+   Files + clipboard
+   ===================================================================== */
+var dlCap = null;
+try{ if(window.claude && window.claude.use) window.claude.use('downloads').then(function(d){ dlCap = d; }, function(){}); }catch(e){}
+function saveFile(name, text){
+  if(dlCap){
+    return dlCap.save({filename:name, data:text}).then(function(){ toast('បានរក្សាទុកឯកសារ'); }, function(e){
+      if(!(e && e.code === 'declined')) fallbackSave(name, text);
+    });
+  }
+  fallbackSave(name, text); return Promise.resolve();
+}
+function fallbackSave(name, text){
+  try{
+    var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    toast('កំពុងទាញយកឯកសារ');
+  }catch(e){ toast('ទាញយកមិនបានទេ សូមចម្លងជំនួស', true); }
+}
+function copyText(text, okMsg){
+  function fallback(){
+    var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    var ok = false; try{ ok = document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta); toast(ok ? okMsg : 'ចម្លងមិនបានទេ', !ok);
+  }
+  try{ navigator.clipboard.writeText(text).then(function(){ toast(okMsg); }, fallback); }catch(e){ fallback(); }
+}
+function csvCell(v){ v = String(v == null ? '' : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function ordersCSV(list){
+  var head = ['លេខបញ្ជាទិញ','ពេលវេលា','ហ្គេម','ID','Server','កញ្ចប់','ចំនួន','USD','វិធីបង់','ស្ថានភាព','អតិថិជន','កំណត់ចំណាំ'];
+  var rows = list.map(function(o){
+    return [o.id, fmtDateFull(o.createdAt), gameLabel(o), o.pid, o.sid || '', o.unit || '', o.amount, Number(o.usd).toFixed(2), o.method || '', STATUS[o.status].label, o.customer || '', o.note || ''];
+  });
+  return '\uFEFF' + [head].concat(rows).map(function(r){ return r.map(csvCell).join(','); }).join('\r\n');
+}
+
+/* =====================================================================
+   Views
+   ===================================================================== */
+function ic(name){
+  var p = {
+    plus:'<path d="M12 5v14M5 12h14"/>', up:'<path d="m6 15 6-6 6 6"/>', down:'<path d="m6 9 6 6 6-6"/>', dl:'<path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/>',
+    edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>'
+  }[name];
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
+}
+function dis(){ return S.canWrite ? '' : ' disabled'; }
+
+/* ---------- Dashboard ---------- */
+function rangeStart(r){ var t = startOfDay(Date.now()); return r === 'today' ? t : (r === '7' ? t - 6 * 864e5 : t - 29 * 864e5); }
+function viewDash(){
+  var start = rangeStart(S.range);
+  var inR = S.orders.filter(function(o){ return o.createdAt >= start; });
+  var rev = inR.filter(isRevenue).reduce(function(s, o){ return s + Number(o.usd || 0); }, 0);
+  var cnt = inR.filter(function(o){ return o.status !== 'cancelled'; }).length;
+  var pending = S.orders.filter(function(o){ return o.status === 'pending'; });
+  var toDeliver = S.orders.filter(function(o){ return o.status === 'paid'; });
+
+  var n = S.range === 'today' ? 24 : (S.range === '7' ? 7 : 30), vals = [], labels = [], i;
+  for(i = 0; i < n; i++){ vals.push(0); }
+  inR.filter(isRevenue).forEach(function(o){
+    var idx = S.range === 'today' ? new Date(o.createdAt).getHours() : Math.floor((startOfDay(o.createdAt) - start) / 864e5);
+    if(idx >= 0 && idx < n) vals[idx] += Number(o.usd || 0);
+  });
+  for(i = 0; i < n; i++){
+    if(S.range === 'today') labels.push(String(i));
+    else { var d = new Date(start + i * 864e5); labels.push(d.getDate() + '/' + (d.getMonth() + 1)); }
+  }
+  var W = 340, H = 150, pl = 6, pb = 22, pt = 12, max = Math.max.apply(null, vals.concat([1])), bw = (W - pl * 2) / n, step = n > 24 ? 6 : (n > 7 ? 3 : 1);
+  var bars = '', lab = '';
+  vals.forEach(function(v, k){
+    var h = Math.max(v > 0 ? 3 : 1.5, (H - pb - pt) * v / max), x = pl + k * bw + bw * .14, y = H - pb - h;
+    bars += '<rect class="bar' + (v > 0 ? '' : ' zero') + '" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + (bw * .72).toFixed(1) + '" height="' + h.toFixed(1) + '" rx="2"/>';
+    if(k % step === 0) lab += '<text x="' + (pl + k * bw + bw / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle">' + labels[k] + '</text>';
+  });
+  var chart = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="ចំណូលតាមរយៈពេល សរុប ' + usd(rev) + '">' +
+    '<line class="gl" x1="' + pl + '" x2="' + (W - pl) + '" y1="' + (H - pb) + '" y2="' + (H - pb) + '"/>' +
+    '<text x="' + pl + '" y="9">' + (max > 1 || rev > 0 ? usd(max) : '') + '</text>' + bars + lab + '</svg>';
+
+  var byGame = {};
+  inR.filter(isRevenue).forEach(function(o){ var k = gameLabel(o); byGame[k] = (byGame[k] || 0) + Number(o.usd || 0); });
+  var top = Object.keys(byGame).map(function(k){ return [k, byGame[k]]; }).sort(function(a, b){ return b[1] - a[1]; }).slice(0, 5);
+  var topMax = top.length ? top[0][1] : 1;
+  var topHTML = top.length ? '<ul class="toplist">' + top.map(function(t){
+    return '<li><span>' + esc(t[0]) + '</span><b class="tnum">' + usd(t[1]) + '</b><div class="meter"><i style="width:' + Math.max(4, t[1] / topMax * 100).toFixed(0) + '%"></i></div></li>';
+  }).join('') + '</ul>' : '<p class="empty">មិនទាន់មានចំណូលក្នុងរយៈពេលនេះទេ</p>';
+
+  var queue = pending.slice(-0).concat([]).slice(0, 0);
+  var todoItems = toDeliver.slice().reverse().concat(pending.slice().reverse()).slice(0, 6);
+  var todoHTML = todoItems.length ? '<div class="todo">' + todoItems.map(function(o){
+    var isPend = o.status === 'pending';
+    return '<div class="todo-row"><div><b>' + esc(o.id) + ' · ' + esc(gameLabel(o)) + '</b><span>' + fmt(o.amount) + ' ' + esc(o.unit || '') + ' · ' + usd(o.usd) + ' · ' + fmtDate(o.createdAt) + '</span></div>' +
+      '<button class="btn small" type="button" data-write data-act="setStatus" data-id="' + esc(o.id) + '" data-s="' + (isPend ? 'paid' : 'delivered') + '">' + (isPend ? 'បានបង់រួច' : 'ដឹកជញ្ជូនរួច') + '</button></div>';
+  }).join('') + '</div>' : '<p class="empty">គ្មានអ្វីត្រូវធ្វើទេ 🎉</p>';
+
+  function chip(v, l){ return '<button class="fchip" type="button" data-act="range" data-v="' + v + '" aria-pressed="' + (S.range === v) + '">' + l + '</button>'; }
+  return '<div class="page-head"><h1>សង្ខេប</h1><div class="chips">' + chip('today', 'ថ្ងៃនេះ') + chip('7', '៧ ថ្ងៃ') + chip('30', '៣០ ថ្ងៃ') + '</div></div>' +
+    '<div class="kpis">' +
+      '<div class="kpi"><div class="k-l">ចំណូល</div><div class="k-v">' + usd(rev) + '</div><div class="k-s">' + riel(rev) + '</div></div>' +
+      '<div class="kpi"><div class="k-l">បញ្ជាទិញ</div><div class="k-v">' + fmt(cnt) + '</div><div class="k-s">មិនរាប់ដែលបោះបង់</div></div>' +
+      '<div class="kpi' + (pending.length ? ' attn' : '') + '"><div class="k-l">រង់ចាំបង់</div><div class="k-v">' + fmt(pending.length) + '</div><div class="k-s">ត្រូវផ្ទៀងផ្ទាត់</div></div>' +
+      '<div class="kpi' + (toDeliver.length ? ' attn' : '') + '"><div class="k-l">រង់ចាំដឹកជញ្ជូន</div><div class="k-v">' + fmt(toDeliver.length) + '</div><div class="k-s">បានបង់រួច</div></div>' +
+    '</div>' +
+    '<div class="grid2"><section class="card"><div class="card-head"><h2>ចំណូលតាមរយៈពេល</h2></div>' + chart + '</section>' +
+    '<section class="card"><div class="card-head"><h2>ហ្គេមលក់ដាច់</h2></div>' + topHTML + '</section></div>' +
+    '<section class="card"><div class="card-head"><h2>ត្រូវធ្វើ</h2><button class="btn small ghost" type="button" data-act="tab" data-v="orders">មើលទាំងអស់</button></div>' + todoHTML + '</section>';
+}
+
+/* ---------- Orders ---------- */
+function filteredOrders(){
+  var q = S.oq.trim().toLowerCase();
+  return S.orders.filter(function(o){
+    if(S.ofilter !== 'all' && o.status !== S.ofilter) return false;
+    if(!q) return true;
+    return (o.id + ' ' + o.pid + ' ' + (o.sid || '') + ' ' + gameLabel(o) + ' ' + (o.customer || '') + ' ' + (o.note || '') + ' ' + (o.method || '')).toLowerCase().indexOf(q) >= 0;
+  });
+}
+function orderCard(o){
+  var st = STATUS[o.status] || STATUS.pending;
+  var next = o.status === 'pending' ? ['paid', 'បានបង់រួច'] : (o.status === 'paid' ? ['delivered', 'ដឹកជញ្ជូនរួច'] : null);
+  return '<article class="ocard"><button class="ocard-main" type="button" data-act="openOrder" data-id="' + esc(o.id) + '">' +
+    '<span class="oc-top"><b class="oc-code">' + esc(o.id) + '</b><span class="badge ' + st.cls + '">' + st.label + '</span></span>' +
+    '<span class="oc-game">' + esc(gameLabel(o)) + '</span>' +
+    '<span class="oc-line">' + esc(o.idLabel || 'ID') + ': ' + esc(idText(o)) + '</span>' +
+    '<span class="oc-line tnum">' + fmt(o.amount) + ' ' + esc(o.unit || '') + ' · ' + usd(o.usd) + ' · ' + esc(o.method || '—') + '</span>' +
+    '<span class="oc-time">' + fmtDateFull(o.createdAt) + (o.customer ? ' · ' + esc(o.customer) : '') + '</span></button>' +
+    (next ? '<button class="btn small" type="button" data-write data-act="setStatus" data-id="' + esc(o.id) + '" data-s="' + next[0] + '">' + next[1] + '</button>' : '<span></span>') +
+    '</article>';
+}
+function ordersListHTML(){
+  var list = filteredOrders();
+  if(!S.orders.length) return '<div class="card empty"><p>មិនទាន់មានបញ្ជាទិញទេ។</p><p class="sub">បន្ថែមបញ្ជាទិញដោយបិទភ្ជាប់សារវិក័យប័ត្រពី Telegram ដែលអតិថិជនផ្ញើមក។</p><button class="btn" type="button" data-write data-act="newOrder">' + ic('plus') + 'បន្ថែមបញ្ជាទិញ</button></div>';
+  if(!list.length) return '<div class="card empty"><p>រកមិនឃើញបញ្ជាទិញដែលត្រូវនឹងការស្វែងរកទេ</p></div>';
+  var shown = list.slice(0, S.olimit);
+  return '<div class="olist">' + shown.map(orderCard).join('') + '</div>' +
+    (list.length > shown.length ? '<button class="btn ghost more" type="button" data-act="moreOrders">បង្ហាញបន្ថែម (' + (list.length - shown.length) + ')</button>' : '');
+}
+function viewOrders(){
+  var counts = {all:S.orders.length};
+  STATUS_ORDER.forEach(function(s){ counts[s] = S.orders.filter(function(o){ return o.status === s; }).length; });
+  function chip(v, l){ return '<button class="fchip" type="button" data-act="ofilter" data-v="' + v + '" aria-pressed="' + (S.ofilter === v) + '">' + l + ' <small>' + counts[v] + '</small></button>'; }
+  return '<div class="page-head"><h1>បញ្ជាទិញ</h1><div class="actions">' +
+    '<button class="btn ghost small" type="button" data-act="exportOrders">' + ic('dl') + 'CSV</button>' +
+    '<button class="btn small" type="button" data-write data-act="newOrder">' + ic('plus') + 'បន្ថែម</button></div></div>' +
+    '<label class="sr-only" for="oq">ស្វែងរកបញ្ជាទិញ</label><input class="search" id="oq" type="search" placeholder="ស្វែងរក លេខបញ្ជាទិញ, ID, ហ្គេម..." value="' + esc(S.oq) + '" autocomplete="off">' +
+    '<div class="chips" style="margin-top:10px">' + chip('all', 'ទាំងអស់') + chip('pending', 'រង់ចាំ') + chip('paid', 'បានបង់') + chip('delivered', 'បានដឹកជញ្ជូន') + chip('cancelled', 'បោះបង់') + '</div>' +
+    '<div id="olistWrap">' + ordersListHTML() + '</div>';
+}
+
+/* ---------- Products ---------- */
+function minPrice(g){ return g.packs.length ? Math.min.apply(null, g.packs.map(function(p){ return p.p; })) : 0; }
+function viewProducts(){
+  var g = S.cfg.games;
+  var rows = g.map(function(x, i){
+    return '<div class="grow' + (x.on === false ? ' off' : '') + '">' +
+      '<span class="gtile" style="--tint:' + esc(x.tint) + '" aria-hidden="true">' + (x.img ? '<img src="' + esc(x.img) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : esc(x.mono)) + '</span>' +
+      '<button class="ginfo" type="button" data-act="editGame" data-id="' + esc(x.id) + '"><b>' + esc(x.short || x.name) + '</b><span>' + esc(x.name + ' · ' + x.region) + '</span><span class="tnum">' + x.packs.length + ' កញ្ចប់' + (x.packs.length ? ' · ចាប់ពី ' + usd(minPrice(x)) : '') + '</span></button>' +
+      '<div class="gctl">' +
+        '<button class="icon-btn plain" type="button" data-write data-act="moveGame" data-id="' + esc(x.id) + '" data-d="-1" aria-label="ដំឡើង"' + (i === 0 ? ' disabled' : '') + '>' + ic('up') + '</button>' +
+        '<button class="icon-btn plain" type="button" data-write data-act="moveGame" data-id="' + esc(x.id) + '" data-d="1" aria-label="ដំចុះ"' + (i === g.length - 1 ? ' disabled' : '') + '>' + ic('down') + '</button>' +
+        '<label class="sw"><input type="checkbox" data-change="toggleGame" data-id="' + esc(x.id) + '"' + (x.on !== false ? ' checked' : '') + dis() + ' aria-label="បើក/បិទ ' + esc(x.short || x.name) + '"><span></span></label>' +
+      '</div></div>';
+  }).join('');
+  var on = g.filter(function(x){ return x.on !== false; }).length;
+  return '<div class="page-head"><h1>ផលិតផល</h1><div class="actions">' +
+    '<button class="btn ghost small" type="button" data-write data-act="bulkPrice">កែតម្លៃទាំងអស់</button>' +
+    '<button class="btn small" type="button" data-write data-act="newGame">' + ic('plus') + 'ហ្គេមថ្មី</button></div></div>' +
+    '<p class="muted" style="margin-bottom:12px">បើកលក់ ' + on + ' ក្នុងចំណោម ' + g.length + ' ហ្គេម។ ការកែប្រែនឹងចេញលើហាងក្រោយពី "ផ្សព្វផ្សាយទៅហាង" នៅផ្នែកការកំណត់។</p>' +
+    '<div class="glist">' + (rows || '<div class="card empty">មិនទាន់មានហ្គេមទេ</div>') + '</div>';
+}
+
+/* ---------- Accounts (Buy Account) ---------- */
+function viewAccounts(){
+  var list = S.cfg.accounts, on = list.filter(function(a){ return a.on !== false; }).length;
+  var rows = list.map(function(a, i){
+    var g = gameById(a.game), tint = g ? g.tint : '#3355F5', mono = g ? g.mono : 'GM';
+    return '<div class="grow' + (a.on === false ? ' off' : '') + '">' +
+      '<span class="gtile" style="--tint:' + esc(tint) + '" aria-hidden="true">' + (a.images && a.images[0] ? '<img src="' + esc(a.images[0]) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : esc(mono)) + '</span>' +
+      '<button class="ginfo" type="button" data-act="editAccount" data-i="' + i + '"><b>' + esc(a.title) + '</b><span>' + esc((a.specs || []).join(' · ')) + '</span><span class="tnum">' + usd(a.usd) + ' · ' + (a.images ? a.images.length : 0) + ' រូប</span></button>' +
+      '<div class="gctl">' +
+        '<button class="icon-btn plain" type="button" data-write data-act="moveAccount" data-i="' + i + '" data-d="-1" aria-label="ដំឡើង"' + (i === 0 ? ' disabled' : '') + '>' + ic('up') + '</button>' +
+        '<button class="icon-btn plain" type="button" data-write data-act="moveAccount" data-i="' + i + '" data-d="1" aria-label="ដំចុះ"' + (i === list.length - 1 ? ' disabled' : '') + '>' + ic('down') + '</button>' +
+        '<label class="sw"><input type="checkbox" data-change="toggleAccount" data-i="' + i + '"' + (a.on !== false ? ' checked' : '') + dis() + ' aria-label="បើក/បិទ"><span></span></label>' +
+      '</div></div>';
+  }).join('');
+  return '<div class="page-head"><h1>គណនីលក់</h1><div class="actions"><button class="btn small" type="button" data-write data-act="newAccount">' + ic('plus') + 'គណនីថ្មី</button></div></div>' +
+    '<p class="muted" style="margin-bottom:12px">បើកលក់ ' + on + ' ក្នុងចំណោម ' + list.length + ' គណនី។ ការកែប្រែនឹងចេញលើហាងក្រោយ "ផ្សព្វផ្សាយទៅហាង" នៅផ្នែកការកំណត់។</p>' +
+    '<div class="glist">' + (rows || '<div class="card empty">មិនទាន់មានគណនីលក់ទេ</div>') + '</div>';
+}
+
+/* ---------- Look: logos, banners, texts ---------- */
+function bannerLabel(b){
+  if(b.game){ var g = gameById(b.game); return 'ទៅកាន់ ' + (g ? (g.short || g.name) : b.game); }
+  return b.url ? esc(b.url) : 'មិនមានតំណ';
+}
+function viewLook(){
+  var s = S.cfg.site, bn = S.cfg.banners;
+  var bnRows = bn.map(function(b, i){
+    return '<div class="brow"><img class="bprev" src="' + esc(b.img) + '" alt="">' +
+      '<button class="ginfo" type="button" data-act="editBanner" data-i="' + i + '"><b>Banner ' + (i + 1) + '</b><span>' + bannerLabel(b) + '</span></button>' +
+      '<div class="gctl">' +
+        '<button class="icon-btn plain" type="button" data-write data-act="moveBanner" data-i="' + i + '" data-d="-1" aria-label="ដំឡើង"' + (i === 0 ? ' disabled' : '') + '>' + ic('up') + '</button>' +
+        '<button class="icon-btn plain" type="button" data-write data-act="moveBanner" data-i="' + i + '" data-d="1" aria-label="ដំចុះ"' + (i === bn.length - 1 ? ' disabled' : '') + '>' + ic('down') + '</button>' +
+        '<label class="sw"><input type="checkbox" data-change="toggleBanner" data-i="' + i + '"' + (b.on !== false ? ' checked' : '') + dis() + ' aria-label="បើក/បិទ"><span></span></label>' +
+      '</div></div>';
+  }).join('');
+  var texts = TEXTS.map(function(x){
+    var v = s.t[x[0]] != null && s.t[x[0]] !== '' ? s.t[x[0]] : x[2];
+    return '<div class="fld"><label for="t-' + x[0] + '">' + x[1] + '</label>' +
+      (x[3] ? '<textarea id="t-' + x[0] + '"' + dis() + '>' + esc(v) + '</textarea>' : '<input id="t-' + x[0] + '" value="' + esc(v) + '"' + dis() + '>') + '</div>';
+  }).join('');
+  return '<div class="page-head"><h1>រូបភាព និងអក្សរ</h1></div>' +
+    '<section class="card"><div class="card-head"><h2>Banner</h2><button class="btn small ghost" type="button" data-write data-act="newBanner">' + ic('plus') + 'បន្ថែម</button></div>' +
+    '<p class="sub" style="margin-bottom:8px">រូបធំនៅទំព័រដើម អាចអូសបាន។ បើគ្មាន Banner ហាងនឹងបង្ហាញ Banner ស្វ័យប្រវត្តិ។ ទំហំណែនាំ 1000×600។</p>' +
+    (bnRows || '<p class="empty">មិនទាន់មាន Banner ទេ</p>') + '</section>' +
+    '<form class="card" id="formLook" novalidate>' +
+    '<div class="card-head"><h2>Logo</h2></div><div class="tgrid">' +
+      imgField('l-logo-topup', 'Logo៖ បញ្ចូលគ្រាប់ពេជ្រ', s.logoTopup, {max:400, hint:'បង្ហាញពេលជ្រើស "បញ្ចូលគ្រាប់ពេជ្រ" និងក្នុងទំព័រតម្លៃហ្គេម។ ទទេ = Logo ដើម។'}) +
+      imgField('l-logo-account', 'Logo៖ ទិញគណនី', s.logoAccount, {max:400, hint:'បង្ហាញពេលជ្រើស "ទិញគណនី"។ ទទេ = Logo ដើម។'}) +
+    '</div>' +
+    '<hr class="divider"><div class="card-head"><h2>ពណ៌ចម្បងរបស់ប្រអប់ និងប៊ូតុង</h2></div>' +
+    '<div class="frow"><span>ប្រើពណ៌ផ្ទាល់ខ្លួន</span><label class="sw"><input type="checkbox" id="l-accent-on"' + (s.accent ? ' checked' : '') + dis() + ' aria-label="ប្រើពណ៌ផ្ទាល់ខ្លួន"><span></span></label></div>' +
+    '<div class="fld"><label for="l-accent">ពណ៌</label><input id="l-accent" type="color" value="' + esc(s.accent || '#3355F5') + '"' + dis() + '></div>' +
+    '<hr class="divider"><div class="card-head"><h2>អក្សរក្នុងប្រអប់ និងប៊ូតុង</h2><button class="btn small ghost" type="button" data-write data-act="resetTexts">ត្រឡប់លំនាំដើម</button></div>' +
+    '<div class="tgrid">' + texts + '</div>' +
+    '<button class="btn block" style="margin-top:16px" type="submit" data-write>រក្សាទុក</button>' +
+    '<p class="hint muted" style="margin-top:8px;font-size:.82rem">រូបភាពនឹងចេញលើហាង ក្រោយពី "ផ្សព្វផ្សាយទៅហាង" នៅផ្នែកការកំណត់។ រូបត្រូវបានបង្រួមទំហំស្វ័យប្រវត្តិ។</p></form>';
+}
+function saveLook(){
+  if(!guard()) return;
+  var t = {};
+  TEXTS.forEach(function(x){ var el = $('#t-' + x[0]); if(!el) return; var v = el.value.trim(); if(v && v !== x[2]) t[x[0]] = v; });
+  var accOn = $('#l-accent-on').checked, acc = $('#l-accent').value, lt = $('#l-logo-topup').value, la = $('#l-logo-account').value;
+  commitConfig(function(c){ c.site.logoTopup = lt; c.site.logoAccount = la; c.site.accent = accOn ? acc : ''; c.site.t = t; }, 'បានរក្សាទុក');
+}
+
+/* ---------- Settings ---------- */
+function viewSettings(){
+  var c = S.cfg, cfgJson = JSON.stringify(storefrontConfig(), null, 2), sc = storefrontConfig();
+  var pays = c.pays.map(function(p){
+    return '<li><span class="pmono" style="--tint:' + esc(p.tint) + '" aria-hidden="true">' + (p.img ? '<img src="' + esc(p.img) + '" alt="">' : esc(p.mono)) + '</span>' +
+      '<button class="ginfo" type="button" data-act="editPay" data-id="' + esc(p.id) + '"><b>' + esc(p.name) + '</b><span>' + esc(p.desc) + '</span></button>' +
+      '<label class="sw"><input type="checkbox" data-change="togglePay" data-id="' + esc(p.id) + '"' + (p.on !== false ? ' checked' : '') + dis() + ' aria-label="បើក/បិទ ' + esc(p.name) + '"><span></span></label>' +
+      '<button class="icon-btn plain" type="button" data-write data-act="delPay" data-id="' + esc(p.id) + '" aria-label="លុប ' + esc(p.name) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></li>';
+  }).join('');
+  var demoCount = S.orders.filter(function(o){ return /^DEMO-/.test(o.id); }).length;
+  var modeText = S.mode === 'server' ? 'ទិន្នន័យរក្សាទុកលើ Server (Vercel + Upstash Redis)។' : S.mode === 'shared' ? 'ទិន្នន័យរក្សាទុកលើ Claude និងចែករំលែកជាមួយអ្នកមានសិទ្ធិកែ។' : 'ទិន្នន័យរក្សាទុកក្នុង browser នេះតែប៉ុណ្ណោះ។ សូមទាញយក Backup ជាប្រចាំ។';
+
+  return '<div class="page-head"><h1>ការកំណត់</h1></div>' +
+
+  '<form class="card" id="formShop" novalidate><div class="card-head"><h2>ហាង</h2></div><div class="fgrid">' +
+    '<div class="fld"><label for="s-name">ឈ្មោះហាង</label><input id="s-name" value="' + esc(c.shop.name) + '"' + dis() + '></div>' +
+    '<div class="fgrid two"><div class="fld"><label for="s-tg">Telegram</label><input id="s-tg" value="' + esc(c.shop.telegram) + '" placeholder="julian_topup" autocapitalize="off"' + dis() + '><p class="err" data-err="s-tg"></p></div>' +
+    '<div class="fld"><label for="s-rate">អត្រា ១ ដុល្លារ = ៛</label><input id="s-rate" type="number" inputmode="numeric" value="' + esc(c.shop.rate) + '"' + dis() + '><p class="err" data-err="s-rate"></p></div></div>' +
+    '<button class="btn" type="submit" data-write>រក្សាទុក</button></div></form>' +
+
+  '<form class="card" id="formKhqr" novalidate><div class="card-head"><h2>គណនីទទួលប្រាក់ KHQR</h2></div><div class="fgrid">' +
+    '<div class="fld"><label for="k-acc">Bakong Account ID</label><input id="k-acc" value="' + esc(c.khqr.account) + '" placeholder="julian@aba" autocapitalize="off" autocomplete="off"' + dis() + '><p class="hint">មើលក្នុង Bakong app ឬកម្មវិធីធនាគាររបស់អ្នក។ មិនបំពេញ = QR គំរូ។</p><p class="err" data-err="k-acc"></p></div>' +
+    '<div class="fgrid two"><div class="fld"><label for="k-name">ឈ្មោះអ្នកលក់ (អក្សរឡាតាំង)</label><input id="k-name" value="' + esc(c.khqr.name) + '" maxlength="25"' + dis() + '><p class="err" data-err="k-name"></p></div>' +
+    '<div class="fld"><label for="k-city">ទីក្រុង</label><input id="k-city" value="' + esc(c.khqr.city) + '" maxlength="15"' + dis() + '></div></div>' +
+    '<div class="fgrid three"><div class="fld"><label for="k-cur">រូបិយប័ណ្ណ QR</label><select id="k-cur"' + dis() + '><option value="USD"' + (c.khqr.currency === 'USD' ? ' selected' : '') + '>USD</option><option value="KHR"' + (c.khqr.currency === 'KHR' ? ' selected' : '') + '>KHR</option></select></div>' +
+    '<div class="fld"><label for="k-exp">ផុតកំណត់ (នាទី)</label><input id="k-exp" type="number" inputmode="numeric" value="' + esc(c.khqr.expireMin) + '"' + dis() + '><p class="err" data-err="k-exp"></p></div>' +
+    '<div class="fld"><label for="k-mcc">MCC</label><input id="k-mcc" value="' + esc(c.khqr.mcc) + '" maxlength="4" inputmode="numeric"' + dis() + '></div></div>' +
+    '<details><summary class="muted" style="cursor:pointer">គណនី Merchant (ជម្រើស)</summary><div class="fgrid two" style="margin-top:10px"><div class="fld"><label for="k-mid">Merchant ID</label><input id="k-mid" value="' + esc(c.khqr.merchantId) + '"' + dis() + '></div><div class="fld"><label for="k-bank">ឈ្មោះធនាគារ</label><input id="k-bank" value="' + esc(c.khqr.bank) + '"' + dis() + '></div></div><p class="hint" style="margin-top:6px">បំពេញទាំងពីរ ប្រសិនបើអ្នកមានគណនី Merchant (ឧ. ABA PayWay)។</p></details>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="submit" data-write>រក្សាទុក</button><button class="btn ghost" type="button" data-act="testQR">សាកល្បង QR</button></div></div></form>' +
+
+  '<section class="card"><div class="card-head"><h2>វិធីបង់ប្រាក់</h2><button class="btn small ghost" type="button" data-write data-act="newPay">' + ic('plus') + 'បន្ថែម</button></div><ul class="pays">' + pays + '</ul></section>' +
+
+  '<section class="card"><div class="card-head"><h2>ផ្សព្វផ្សាយទៅហាង</h2></div>' +
+    '<p class="sub">ការកំណត់ ផលិតផល តម្លៃ និងវិធីបង់ទាំងអស់ ត្រូវបញ្ចូលទៅហាងតាម Config នេះ។ ចម្លង Config ហើយបិទភ្ជាប់ក្នុងឯកសារហាង (<b>&lt;script id="jt-config"&gt;</b>) ឬផ្ញើមកខ្ញុំ (Claude) ដើម្បីអាប់ដេតហាងជូន។</p>' +
+    '<div class="frow" style="margin-top:8px"><span>បង្ហាញបញ្ជាទិញថ្មីៗពិតក្នុងហាង</span><label class="sw"><input type="checkbox" data-change="toggleTicker"' + (c.ticker.on ? ' checked' : '') + dis() + ' aria-label="បង្ហាញបញ្ជាទិញថ្មីៗ"><span></span></label></div>' +
+    '<p class="hint muted" style="font-size:.82rem;margin-bottom:10px">បង្ហាញតែ ID ខ្លះ (ឧ. 123***) នៃបញ្ជាទិញដែលបានបង់។ ' + (c.ticker.on ? '' : 'ពេលបិទ ផ្ទាំងនេះនឹងបាត់ពីហាង។') + '</p>' +
+    '<dl class="kv"><dt>ហ្គេមបើកលក់</dt><dd>' + sc.games.length + '</dd><dt>វិធីបង់</dt><dd>' + sc.pays.length + '</dd><dt>បញ្ជាទិញក្នុង ticker</dt><dd>' + sc.ticker.length + '</dd><dt>ទំហំ Config</dt><dd>' + (cfgJson.length / 1024).toFixed(1) + ' KB</dd></dl>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn" type="button" data-act="copyCfg">ចម្លង Config</button><button class="btn ghost" type="button" data-act="dlCfg">' + ic('dl') + 'ទាញយក .json</button></div>' +
+    '<div class="fld" style="margin-top:14px"><label for="pub-file">អាប់ដេតឯកសារហាងដោយស្វ័យប្រវត្តិ</label><input id="pub-file" type="file" accept=".html,text/html"><p class="hint">ជ្រើសឯកសារ <b>index.html</b> របស់ហាង ប្រព័ន្ធនឹងដាក់ Config ចូលហើយឱ្យអ្នកទាញយកឯកសារថ្មី។ បន្ទាប់មក upload ទៅ hosting ជំនួសឯកសារចាស់។</p><p class="err" id="pub-msg" role="status"></p></div>' +
+    '<details style="margin-top:12px"><summary class="muted" style="cursor:pointer">មើល Config</summary><pre class="code" style="margin-top:8px">' + esc(cfgJson.length > 6000 ? cfgJson.slice(0, 6000) + '\n…' : cfgJson) + '</pre></details></section>' +
+
+  '<section class="card"><div class="card-head"><h2>ទិន្នន័យ</h2></div><p class="sub">' + esc(modeText) + '</p>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn" type="button" data-act="backup">' + ic('dl') + 'ទាញយក Backup</button><button class="btn ghost" type="button" data-write data-act="restore">ស្តារពី Backup</button></div>' +
+    '<hr class="divider">' +
+    '<div class="frow"><span>បន្ថែមបញ្ជាទិញគំរូ ១២ (សម្រាប់សាកល្បង)</span><button class="btn small ghost" type="button" data-write data-act="addDemo">បន្ថែម</button></div>' +
+    (demoCount ? '<div class="frow"><span>លុបបញ្ជាទិញគំរូ (' + demoCount + ')</span><button class="btn small ghost" type="button" data-write data-act="delDemo">លុប</button></div>' : '') +
+    '<div class="frow"><span>លុបបញ្ជាទិញចាស់ជាង ៩០ ថ្ងៃ</span><button class="btn small ghost" type="button" data-write data-act="purgeOld">លុប</button></div>' +
+    '<div class="frow"><span>កំណត់ការកំណត់ទាំងអស់ឡើងវិញ</span><button class="btn small danger" type="button" data-write data-act="resetCfg">កំណត់ឡើងវិញ</button></div></section>';
+}
+
+/* ---------- render ---------- */
+function renderNav(){ $$('#nav button').forEach(function(b){ if(b.dataset.tab === S.tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
+function renderChip(){
+  var chip = $('#modeChip');
+  if(!S.canWrite){ chip.className = 'chip ro'; chip.innerHTML = '<i></i>មើលតែប៉ុណ្ណោះ'; }
+  else if(S.mode === 'server'){ chip.className = 'chip'; chip.innerHTML = '<i></i>Server'; }
+  else if(S.mode === 'shared'){ chip.className = 'chip'; chip.innerHTML = '<i></i>ចែករំលែក'; }
+  else { chip.className = 'chip local'; chip.innerHTML = '<i></i>ក្នុងឧបករណ៍'; }
+}
+function renderView(){
+  var v = $('#view'), html;
+  if(S.tab === 'orders') html = viewOrders(); else if(S.tab === 'products') html = viewProducts(); else if(S.tab === 'accounts') html = viewAccounts(); else if(S.tab === 'look') html = viewLook(); else if(S.tab === 'settings') html = viewSettings(); else html = viewDash();
+  var banner = '';
+  if(!S.canWrite) banner = '<div class="banner ro">អ្នកមានសិទ្ធិមើលតែប៉ុណ្ណោះ។ សូមឱ្យម្ចាស់ផ្តល់សិទ្ធិកែប្រែ ("Can edit") ដើម្បីកែទិន្នន័យ។</div>';
+  else if(S.mode === 'local') banner = '<div class="banner">ទិន្នន័យរក្សាទុកក្នុង browser នេះតែប៉ុណ្ណោះ (មិនចែករំលែកទៅឧបករណ៍ផ្សេង)។ បើកក្នុង Claude ដើម្បីរក្សាទុក និងចែករំលែកជាមួយក្រុម។</div>';
+  v.innerHTML = banner + html;
+}
+function renderAll(fromData){
+  if(S.mode === 'boot') return;
+  renderChip(); renderNav();
+  /* don't clobber a form the person is typing in when live data arrives */
+  if(fromData){
+    var ae = document.activeElement;
+    if((S.tab === 'settings' || S.tab === 'look') && ae && ae.closest && ae.closest('#view') && /INPUT|SELECT|TEXTAREA/.test(ae.tagName)) return;
+    if(S.tab === 'orders' && ae && ae.id === 'oq'){ $('#olistWrap').innerHTML = ordersListHTML(); return; }
+  }
+  renderView();
+}
+function setTab(t){
+  S.tab = t; S.olimit = 60; renderAll(); window.scrollTo(0, 0);
+}
+
+/* =====================================================================
+   Sheets
+   ===================================================================== */
+var sheet = $('#sheet');
+function openSheet(type, title, body, foot, ctx){
+  S.sheet = {type:type, ctx:ctx || {}};
+  $('#shTitle').textContent = title;
+  $('#shBody').innerHTML = body;
+  $('#shFoot').innerHTML = foot || '';
+  if(typeof sheet.showModal === 'function') sheet.showModal(); else sheet.setAttribute('open', '');
+  $('#shBody').scrollTop = 0;
+  $('#shTitle').focus({preventScroll:true});
+}
+function closeSheet(){ S.sheet = null; if(sheet.close) sheet.close(); else sheet.removeAttribute('open'); }
+sheet.addEventListener('close', function(){ S.sheet = null; });
+sheet.addEventListener('click', function(e){ if(e.target === sheet) closeSheet(); });
+
+var cf = $('#confirmDlg'), cfResolve = null;
+function askConfirm(title, text, yes){
+  return new Promise(function(res){
+    cfResolve = res;
+    $('#cfTitle').textContent = title; $('#cfText').textContent = text || ''; $('#cfYes').textContent = yes || 'យល់ព្រម';
+    if(typeof cf.showModal === 'function') cf.showModal(); else cf.setAttribute('open', '');
+  });
+}
+function endConfirm(v){ var r = cfResolve; cfResolve = null; if(cf.close) cf.close(); else cf.removeAttribute('open'); if(r) r(v); }
+$('#cfYes').addEventListener('click', function(){ endConfirm(true); });
+$('#cfNo').addEventListener('click', function(){ endConfirm(false); });
+cf.addEventListener('close', function(){ if(cfResolve){ var r = cfResolve; cfResolve = null; r(false); } });
+
+function fld(id, label, val, opts){
+  opts = opts || {};
+  return '<div class="fld"' + (opts.hidden ? ' hidden' : '') + (opts.wrapId ? ' id="' + opts.wrapId + '"' : '') + '><label for="' + id + '">' + label + '</label>' +
+    '<input id="' + id + '" value="' + esc(val) + '"' + (opts.type ? ' type="' + opts.type + '"' : '') + (opts.mode ? ' inputmode="' + opts.mode + '"' : '') + (opts.step ? ' step="' + opts.step + '"' : '') +
+    (opts.ph ? ' placeholder="' + esc(opts.ph) + '"' : '') + ' autocomplete="off"' + (opts.max ? ' maxlength="' + opts.max + '"' : '') + '>' +
+    (opts.hint ? '<p class="hint">' + opts.hint + '</p>' : '') + '<p class="err" data-err="' + id + '"></p></div>';
+}
+function setErr(id, msg){ var e = $('[data-err="' + id + '"]'); if(e) e.textContent = msg || ''; }
+function clearErrs(){ $$('[data-err]', $('#shBody')).forEach(function(e){ e.textContent = ''; }); }
+
+/* ---------- Order sheet ---------- */
+function newOrderTemplate(){
+  var g = S.cfg.games.filter(function(x){ return x.on !== false; })[0] || S.cfg.games[0] || null;
+  return {id:genCode(), gameId:g ? g.id : '', gameName:g ? g.name : '', region:g ? g.region : '', unit:g ? g.unit : '', idLabel:g && g.idType === 'text' ? 'Username' : 'Player ID',
+    pid:'', sid:'', amount:'', usd:'', method:(S.cfg.pays[0] || {}).name || 'KHQR', status:'pending', customer:'', note:'', createdAt:Date.now(), log:[]};
+}
+function openOrderSheet(o, isNew){
+  var games = S.cfg.games;
+  var gameOpts = games.map(function(g){ return '<option value="' + esc(g.id) + '"' + (g.id === o.gameId ? ' selected' : '') + '>' + esc(g.name + ' ' + g.region) + '</option>'; }).join('') +
+    '<option value="_other"' + (!o.gameId ? ' selected' : '') + '>ផ្សេងៗ (បញ្ចូលដោយដៃ)</option>';
+  var payOpts = S.cfg.pays.map(function(p){ return '<option value="' + esc(p.name) + '"' + (p.name === o.method ? ' selected' : '') + '>' + esc(p.name) + '</option>'; }).join('');
+  if(o.method && !S.cfg.pays.some(function(p){ return p.name === o.method; })) payOpts += '<option value="' + esc(o.method) + '" selected>' + esc(o.method) + '</option>';
+  var stOpts = STATUS_ORDER.map(function(s){ return '<option value="' + s + '"' + (s === o.status ? ' selected' : '') + '>' + STATUS[s].label + '</option>'; }).join('');
+  var g0 = gameById(o.gameId);
+  var body = '<form id="sf" novalidate><div class="fgrid">' +
+    (isNew ? '<div class="fld"><label for="f-paste">បិទភ្ជាប់សារវិក័យប័ត្រពី Telegram</label><textarea id="f-paste" placeholder="វិក័យប័ត្រ Julian Topup&#10;លេខបញ្ជាទិញ: JL-XXXXXX&#10;ហ្គេម: ..." autocomplete="off"></textarea><p class="hint">វានឹងបំពេញព័ត៌មានខាងក្រោមដោយស្វ័យប្រវត្តិ។</p></div><hr class="divider" style="margin:2px 0">' : '') +
+    fld('f-code', 'លេខបញ្ជាទិញ', o.id, isNew ? {} : {}) +
+    '<div class="fld"><label for="f-game">ហ្គេម</label><select id="f-game">' + gameOpts + '</select></div>' +
+    fld('f-gname', 'ឈ្មោះហ្គេម', o.gameName, {hidden: !!o.gameId, wrapId: 'w-gname'}) +
+    '<div class="fgrid two">' + fld('f-pid', o.idLabel || 'Player ID', o.pid, {wrapId:'w-pid'}) + fld('f-sid', 'Server ID', o.sid || '', {hidden: !(g0 ? g0.server : o.sid), wrapId:'w-sid', mode:'numeric'}) + '</div>' +
+    '<div class="fld"><label for="f-pack">កញ្ចប់</label><select id="f-pack"></select></div>' +
+    '<div class="fgrid three">' + fld('f-amount', 'ចំនួន', o.amount, {type:'number', mode:'numeric'}) + fld('f-unit', 'ឯកតា', o.unit || '') + fld('f-usd', 'តម្លៃ USD', o.usd, {type:'number', mode:'decimal', step:'0.01'}) + '</div>' +
+    '<div class="fgrid two"><div class="fld"><label for="f-method">វិធីបង់</label><select id="f-method">' + payOpts + '</select></div><div class="fld"><label for="f-status">ស្ថានភាព</label><select id="f-status">' + stOpts + '</select></div></div>' +
+    '<div class="fgrid two">' + fld('f-cust', 'ឈ្មោះអតិថិជន (ជម្រើស)', o.customer || '') + fld('f-time', 'ពេលវេលា', toLocalInput(o.createdAt), {type:'datetime-local'}) + '</div>' +
+    '<div class="fld"><label for="f-note">កំណត់ចំណាំ</label><textarea id="f-note" autocomplete="off">' + esc(o.note || '') + '</textarea></div>' +
+    (!isNew && o.log && o.log.length ? '<div><div class="lbl" style="font-weight:600;font-size:.92rem">ប្រវត្តិស្ថានភាព</div>' + o.log.map(function(l){ return '<div class="logrow"><span>' + STATUS[l.s].label + '</span><span>' + fmtDateFull(l.t) + '</span></div>'; }).join('') + '</div>' : '') +
+    '</div></form>';
+  var foot = isNew ? '<button class="btn ghost" type="button" data-act="closeSheet">បោះបង់</button><button class="btn" type="submit" form="sf" data-write>បន្ថែមបញ្ជាទិញ</button>' :
+    '<button class="btn danger" type="button" data-write data-act="delOrder" data-id="' + esc(o.id) + '">លុប</button><button class="btn ghost" type="button" data-act="copyDelivery" data-id="' + esc(o.id) + '">ចម្លងសារដឹកជញ្ជូន</button><button class="btn" type="submit" form="sf" data-write>រក្សាទុក</button>';
+  openSheet('order', isNew ? 'បញ្ជាទិញថ្មី' : o.id, body, foot, {isNew:isNew, orig:o});
+  refreshOrderGameFields(o.amount === '' ? null : o.amount, true);
+  if(!S.canWrite) $$('#sf input,#sf select,#sf textarea').forEach(function(x){ x.disabled = true; });
+}
+/* Sync pack list / server field / labels with the chosen game */
+function refreshOrderGameFields(keepAmount, initial){
+  var gid = $('#f-game').value, g = gameById(gid), sel = $('#f-pack');
+  var opts = '<option value="">— ជ្រើសកញ្ចប់ ឬបញ្ចូលខាងក្រោម —</option>';
+  if(g) opts += g.packs.map(function(p, i){ return '<option value="' + i + '">' + fmt(p.a) + ' ' + esc(g.unitKm || g.unit) + ' — ' + usd(p.p) + '</option>'; }).join('');
+  sel.innerHTML = opts;
+  $('#w-gname').hidden = !!g;
+  $('#w-sid').hidden = !(g && g.server);
+  var lbl = $('label[for="f-pid"]'); lbl.textContent = g ? (g.idType === 'text' ? 'Username' : 'Player ID') : ($('#f-pid').dataset.lbl || lbl.textContent);
+  if(g && !initial) $('#f-unit').value = g.unit;
+  if(initial && g){ /* pre-select a matching pack */
+    var am = Number($('#f-amount').value), us = Number($('#f-usd').value);
+    g.packs.forEach(function(p, i){ if(p.a === am && Math.abs(p.p - us) < 0.005) sel.value = String(i); });
+  }
+}
+
+function saveOrderFromForm(){
+  clearErrs();
+  var ctx = S.sheet.ctx, orig = ctx.orig, isNew = ctx.isNew;
+  var code = $('#f-code').value.trim(), gid = $('#f-game').value, g = gameById(gid);
+  var pid = $('#f-pid').value.trim(), sid = $('#f-sid').value.trim();
+  var amount = Number($('#f-amount').value), price = Number($('#f-usd').value);
+  var bad = false;
+  if(!/^[A-Za-z0-9-]{3,30}$/.test(code)){ setErr('f-code', 'អក្សរឡាតាំង លេខ និង - ប៉ុណ្ណោះ (៣-៣០ តួ)'); bad = true; }
+  else if(isNew && findOrder(code)){ setErr('f-code', 'លេខបញ្ជាទិញនេះមានរួចហើយ'); bad = true; }
+  if(!g && !$('#f-gname').value.trim()){ setErr('f-gname', 'សូមបញ្ចូលឈ្មោះហ្គេម'); bad = true; }
+  if(!pid){ setErr('f-pid', 'សូមបញ្ចូល ID'); bad = true; }
+  if(g && g.server && !sid){ setErr('f-sid', 'សូមបញ្ចូល Server ID'); bad = true; }
+  if(!(amount > 0)){ setErr('f-amount', 'ចំនួនត្រូវធំជាង ០'); bad = true; }
+  if(!(price >= 0) || $('#f-usd').value === ''){ setErr('f-usd', 'សូមបញ្ចូលតម្លៃ'); bad = true; }
+  if(bad){ var first = $('.err:not(:empty)', $('#shBody')); if(first){ var inp = document.getElementById(first.dataset.err); if(inp) inp.focus(); } return; }
+  var when = new Date($('#f-time').value).getTime(); if(!isFinite(when)) when = orig.createdAt || Date.now();
+  var status = $('#f-status').value;
+  var o = Object.assign({}, orig, {
+    id: isNew ? code : orig.id,
+    gameId: g ? g.id : '', gameName: g ? g.name : $('#f-gname').value.trim(), region: g ? g.region : '',
+    unit: $('#f-unit').value.trim(), idLabel: g ? (g.idType === 'text' ? 'Username' : 'Player ID') : (orig.idLabel || 'Player ID'),
+    pid: pid, sid: (g ? g.server : sid) ? sid : '', amount: amount, usd: round2(price), method: $('#f-method').value, status: status,
+    customer: $('#f-cust').value.trim(), note: $('#f-note').value.trim(), createdAt: when
+  });
+  o.log = (orig.log || []).slice();
+  if(isNew) o.log.push({s:status, t:when});
+  else if(status !== orig.status) o.log.push({s:status, t:Date.now()});
+  commitOrder(o, isNew ? 'បានបន្ថែមបញ្ជាទិញ' : 'បានរក្សាទុក').then(function(ok){ if(ok) closeSheet(); });
+}
+
+/* ---------- Game sheet ---------- */
+function packRow(p, i, isPop){
+  return '<div class="prow"><input type="number" class="p-a" inputmode="numeric" min="1" value="' + esc(p.a) + '" aria-label="ចំនួន"><input type="number" class="p-p" inputmode="decimal" step="0.01" min="0" value="' + esc(p.p) + '" aria-label="តម្លៃ USD">' +
+    pimgCell(p) + '<label class="star" title="ពេញនិយម"><input type="radio" name="pop" class="p-pop"' + (isPop ? ' checked' : '') + ' aria-label="ពេញនិយម">★</label>' +
+    '<button class="icon-btn plain" type="button" data-act="delPack" aria-label="លុបកញ្ចប់"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>';
+}
+function openGameSheet(g, isNew){
+  var others = S.cfg.games.filter(function(x){ return x.id !== g.id; });
+  var body = '<form id="sf" novalidate><div class="fgrid">' +
+    '<div class="fgrid two">' + fld('g-name', 'ឈ្មោះហ្គេម', g.name) + fld('g-region', 'តំបន់', g.region, {ph:'CAMBODIA'}) + '</div>' +
+    '<div class="fgrid two">' + fld('g-short', 'ឈ្មោះខ្លីលើកាត', g.short, {ph:'MLBB KH'}) + fld('g-mono', 'អក្សរកាត់ (២)', g.mono, {max:3}) + '</div>' +
+    '<div class="fgrid two">' + fld('g-unit', 'ឯកតា (អង់គ្លេស)', g.unit, {ph:'Diamonds'}) + fld('g-unitkm', 'ឯកតា (ខ្មែរ)', g.unitKm, {ph:'គ្រាប់ពេជ្រ'}) + '</div>' +
+    '<div class="fgrid two"><div class="fld"><label for="g-tint">ពណ៌កាត</label><input id="g-tint" type="color" value="' + esc(g.tint || '#3355F5') + '"></div>' +
+    '<div class="fld"><label for="g-idtype">ប្រភេទ ID</label><select id="g-idtype"><option value="num"' + (g.idType !== 'text' ? ' selected' : '') + '>Player ID (លេខ)</option><option value="text"' + (g.idType === 'text' ? ' selected' : '') + '>Username (អក្សរ)</option></select></div></div>' +
+    imgField('g-img', 'រូបគម្របហ្គេម (ជម្រើស)', g.img, {max:400, hint:'បង្ហាញលើកាតហ្គេមក្នុងទំព័រដើម។ ទទេ = គម្របស្វ័យប្រវត្តិ។'}) +
+    imgField('g-packimg', 'រូប Item លំនាំដើម (គ្រប់កញ្ចប់)', g.packImg, {max:192, hint:'ប្រើជាមួយកញ្ចប់ដែលគ្មានរូបផ្ទាល់ខ្លួន។ អាចដាក់រូបផ្សេងគ្នាក្នុងជួរកញ្ចប់ខាងក្រោម។'}) +
+    '<div class="frow"><span>ត្រូវការ Server ID</span><label class="sw"><input type="checkbox" id="g-server"' + (g.server ? ' checked' : '') + ' aria-label="ត្រូវការ Server ID"><span></span></label></div>' +
+    '<div class="frow"><span>បើកលក់ក្នុងហាង</span><label class="sw"><input type="checkbox" id="g-on"' + (g.on !== false ? ' checked' : '') + ' aria-label="បើកលក់"><span></span></label></div>' +
+    '<hr class="divider" style="margin:2px 0">' +
+    '<div><div class="card-head" style="margin-bottom:8px"><div class="lbl" style="font-weight:700">កញ្ចប់ និងតម្លៃ</div><div style="display:flex;gap:6px"><button class="btn small ghost" type="button" data-act="sortPacks">តម្រៀប</button><button class="btn small" type="button" data-act="addPack">' + ic('plus') + 'កញ្ចប់</button></div></div>' +
+    '<div class="phead"><span>ចំនួន</span><span>តម្លៃ USD</span><span>រូប</span><span style="width:40px;text-align:center">★</span><span style="width:44px"></span></div>' +
+    '<div id="packRows">' + g.packs.map(function(p, i){ return packRow(p, i, i === g.pop); }).join('') + '</div><p class="err" data-err="g-packs"></p>' +
+    (others.length ? '<div class="fld" style="margin-top:8px"><label for="g-copy">ចម្លងកញ្ចប់ពីហ្គេមផ្សេង</label><select id="g-copy"><option value="">—</option>' + others.map(function(x){ return '<option value="' + esc(x.id) + '">' + esc(x.short || x.name) + '</option>'; }).join('') + '</select></div>' : '') +
+    '</div></div></form>';
+  var foot = isNew ? '<button class="btn ghost" type="button" data-act="closeSheet">បោះបង់</button><button class="btn" type="submit" form="sf" data-write>បន្ថែមហ្គេម</button>' :
+    '<button class="btn danger" type="button" data-write data-act="delGame" data-id="' + esc(g.id) + '">លុប</button><button class="btn ghost" type="button" data-write data-act="dupGame" data-id="' + esc(g.id) + '">ចម្លង</button><button class="btn" type="submit" form="sf" data-write>រក្សាទុក</button>';
+  openSheet('game', isNew ? 'ហ្គេមថ្មី' : (g.short || g.name), body, foot, {isNew:isNew, orig:g});
+  if(!S.canWrite) $$('#sf input,#sf select,#sf textarea').forEach(function(x){ x.disabled = true; });
+}
+function readPackRows(){
+  var rows = $$('#packRows .prow'), packs = [], pop = 0;
+  rows.forEach(function(r){
+    var a = Number($('.p-a', r).value), p = Number($('.p-p', r).value);
+    if(a > 0 && p >= 0 && $('.p-p', r).value !== ''){ if($('.p-pop', r).checked) pop = packs.length; packs.push({a:a, p:round2(p), img:($('.p-img', r) || {}).value || ''}); }
+  });
+  return {packs:packs, pop:pop};
+}
+function saveGameFromForm(){
+  clearErrs();
+  var ctx = S.sheet.ctx, orig = ctx.orig, isNew = ctx.isNew;
+  var name = $('#g-name').value.trim(), bad = false;
+  if(!name){ setErr('g-name', 'សូមបញ្ចូលឈ្មោះ'); bad = true; }
+  var pk = readPackRows();
+  if(!pk.packs.length){ setErr('g-packs', 'ត្រូវមានកញ្ចប់យ៉ាងតិច ១'); bad = true; }
+  if(bad){ if(!name) $('#g-name').focus(); return; }
+  var region = $('#g-region').value.trim();
+  var g = Object.assign({}, orig, {
+    name:name, region:region, short:$('#g-short').value.trim() || (name + (region ? ' ' + region : '')),
+    mono:($('#g-mono').value.trim() || name.slice(0, 2)).toUpperCase(), unit:$('#g-unit').value.trim() || 'Diamonds', unitKm:$('#g-unitkm').value.trim() || $('#g-unit').value.trim() || 'Diamonds',
+    img:$('#g-img').value, packImg:$('#g-packimg').value, tint:$('#g-tint').value, idType:$('#g-idtype').value, server:$('#g-server').checked, on:$('#g-on').checked, packs:pk.packs, pop:pk.pop
+  });
+  if(isNew){
+    var base = slug(g.short || name) || 'game', id = base, n = 2;
+    while(gameById(id)){ id = base + '-' + n++; }
+    g.id = id;
+  }
+  commitConfig(function(c){
+    var i = c.games.findIndex(function(x){ return x.id === g.id; });
+    if(i >= 0) c.games[i] = g; else c.games.push(g);
+  }, isNew ? 'បានបន្ថែមហ្គេម' : 'បានរក្សាទុក').then(function(ok){ if(ok) closeSheet(); });
+}
+function newGameTemplate(){
+  return {id:'', short:'', name:'', region:'', mono:'', tint:'#3355F5', unit:'Diamonds', unitKm:'គ្រាប់ពេជ្រ', server:false, idType:'num', pop:0, on:true, packs:[{a:100, p:1.00}]};
+}
+function openBulkPrice(){
+  openSheet('bulk', 'កែតម្លៃទាំងអស់',
+    '<form id="sf" novalidate><div class="fgrid"><p class="muted">បង្កើន ឬបន្ថយតម្លៃគ្រប់កញ្ចប់ក្នុងហ្គេមដែលបានជ្រើស តាមភាគរយ។</p>' +
+    fld('b-pct', 'ភាគរយ (%) ឧ. 5 ឬ -10', '', {type:'number', mode:'decimal', step:'0.1'}) +
+    '<div class="fld"><label for="b-round">ចុះបង្គត់ទៅ</label><select id="b-round"><option value="0.01">$0.01</option><option value="0.05" selected>$0.05</option><option value="0.1">$0.10</option></select></div>' +
+    '<div><div class="lbl" style="font-weight:600;font-size:.92rem;margin-bottom:6px">ហ្គេម</div>' + S.cfg.games.map(function(g){
+      return '<div class="frow"><span>' + esc(g.short || g.name) + '</span><label class="sw"><input type="checkbox" class="b-g" value="' + esc(g.id) + '" checked aria-label="' + esc(g.short || g.name) + '"><span></span></label></div>';
+    }).join('') + '</div></div></form>',
+    '<button class="btn ghost" type="button" data-act="closeSheet">បោះបង់</button><button class="btn" type="submit" form="sf">អនុវត្ត</button>');
+}
+function applyBulk(){
+  clearErrs();
+  var pct = Number($('#b-pct').value), step = Number($('#b-round').value);
+  if(!$('#b-pct').value || !isFinite(pct) || pct <= -90 || pct > 500){ setErr('b-pct', 'សូមបញ្ចូលភាគរយត្រឹមត្រូវ (-90 ដល់ 500)'); $('#b-pct').focus(); return; }
+  var ids = $$('.b-g:checked').map(function(x){ return x.value; });
+  if(!ids.length){ toast('សូមជ្រើសយ៉ាងតិចមួយហ្គេម', true); return; }
+  commitConfig(function(c){
+    c.games.forEach(function(g){
+      if(ids.indexOf(g.id) < 0) return;
+      g.packs.forEach(function(p){ p.p = Math.max(step, round2(Math.round(p.p * (1 + pct / 100) / step) * step)); });
+    });
+  }, 'បានកែតម្លៃ ' + ids.length + ' ហ្គេម').then(function(ok){ if(ok) closeSheet(); });
+}
+
+/* ---------- Image helpers ---------- */
+function prevHTML(v){ return v ? '<img src="' + esc(v) + '" alt="">' : 'គ្មានរូប'; }
+function imgField(id, label, val, o){
+  o = o || {}; val = val || '';
+  var isData = /^data:/.test(val);
+  return '<div class="fld"><span class="lbl">' + label + '</span><div class="imgrow"><span class="imgprev' + (o.wide ? ' wide' : '') + '" id="prev-' + id + '">' + prevHTML(val) + '</span>' +
+    '<div class="imgctl"><label class="btn small ghost">ជ្រើសរូប<input class="sr-only" type="file" accept="image/*" data-imgfile="' + id + '" data-max="' + (o.max || 400) + '"' + dis() + '></label>' +
+    '<button class="btn small ghost" type="button" data-write data-act="clearImg" data-id="' + id + '">ដកចេញ</button></div></div>' +
+    '<input type="hidden" id="' + id + '" value="' + esc(val) + '">' +
+    '<input type="text" data-imgurl="' + id + '" placeholder="ឬបិទភ្ជាប់តំណរូប https://..." value="' + (isData ? '' : esc(val)) + '" autocomplete="off"' + dis() + '>' +
+    (o.hint ? '<p class="hint">' + o.hint + '</p>' : '') + '</div>';
+}
+function setImg(id, v){
+  var h = document.getElementById(id); if(h) h.value = v || '';
+  var p = document.getElementById('prev-' + id); if(p) p.innerHTML = prevHTML(v);
+  var u = document.querySelector('[data-imgurl="' + id + '"]'); if(u) u.value = /^data:/.test(v || '') ? '' : (v || '');
+}
+function resizeImage(file, max, q){
+  return new Promise(function(res, rej){
+    if(!/^image\//.test(file.type)) return rej(new Error('type'));
+    var rd = new FileReader(); rd.onerror = rej;
+    rd.onload = function(){
+      var im = new Image(); im.onerror = rej;
+      im.onload = function(){
+        var iw = im.naturalWidth || im.width || max, ih = im.naturalHeight || im.height || max;
+        var s = Math.min(1, max / Math.max(iw, ih)), w = Math.max(1, Math.round(iw * s)), h = Math.max(1, Math.round(ih * s));
+        var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(im, 0, 0, w, h);
+        var out = cv.toDataURL('image/webp', q || .85);
+        if(out.indexOf('data:image/webp') !== 0) out = cv.toDataURL('image/png');
+        res(out);
+      };
+      im.src = rd.result;
+    };
+    rd.readAsDataURL(file);
+  });
+}
+function imgPicked(input){
+  var f = input.files && input.files[0]; if(!f) return;
+  var id = input.dataset.imgfile, max = Number(input.dataset.max) || 400;
+  input.value = '';
+  resizeImage(f, max, .85).then(function(u){ setImg(id, u); }, function(){ toast('មិនអាចអានរូបបានទេ', true); });
+}
+function pimgCell(p){
+  var v = (p && p.img) || '';
+  return '<div class="pimg' + (v ? ' has' : '') + '"><label class="pimg-l"><input class="sr-only" type="file" accept="image/*" data-pfile><span class="pimg-prev">' + (v ? '<img src="' + esc(v) + '" alt="">' : '+') + '</span></label>' +
+    '<input type="hidden" class="p-img" value="' + esc(v) + '"><button class="pimg-x" type="button" data-act="clearPackImg" aria-label="ដករូប">×</button></div>';
+}
+function packImgPicked(input){
+  var f = input.files && input.files[0]; if(!f) return;
+  var cell = input.closest('.pimg'); input.value = '';
+  resizeImage(f, 192, .85).then(function(u){
+    $('.p-img', cell).value = u; $('.pimg-prev', cell).innerHTML = '<img src="' + u + '" alt="">'; cell.classList.add('has');
+  }, function(){ toast('មិនអាចអានរូបបានទេ', true); });
+}
+function moveIn(key, i, d){
+  commitConfig(function(c){
+    var l = c[key], j = i + d; if(i < 0 || j < 0 || j >= l.length) return;
+    var t = l[i]; l[i] = l[j]; l[j] = t;
+  });
+}
+
+/* ---------- Account sheet ---------- */
+function openAccountSheet(a, idx){
+  var isNew = idx < 0;
+  var gopts = S.cfg.games.map(function(g){ return '<option value="' + esc(g.id) + '"' + (g.id === a.game ? ' selected' : '') + '>' + esc(g.name + ' ' + g.region) + '</option>'; }).join('');
+  var body = '<form id="sf" novalidate><div class="fgrid">' +
+    '<div class="fld"><label for="a-game">ហ្គេម</label><select id="a-game">' + gopts + '</select></div>' +
+    fld('a-title', 'ចំណងជើងគណនី', a.title) +
+    fld('a-usd', 'តម្លៃ USD', a.usd, {type:'number', mode:'decimal', step:'0.01'}) +
+    '<div class="fld"><label for="a-specs">ព័ត៌មានលម្អិត (មួយបន្ទាត់ក្នុងមួយចំណុច)</label><textarea id="a-specs">' + esc((a.specs || []).join('\n')) + '</textarea></div>' +
+    '<div class="fld"><span class="lbl">រូបថតអេក្រង់គណនី (អតិបរមា ៨)</span><div class="thumbs" id="a-thumbs"></div><label class="btn small ghost" style="width:max-content">បន្ថែមរូប<input class="sr-only" id="a-imgfiles" type="file" accept="image/*" multiple></label></div>' +
+    '<div class="frow"><span>បើកលក់ក្នុងហាង</span><label class="sw"><input type="checkbox" id="a-on"' + (a.on !== false ? ' checked' : '') + ' aria-label="បើកលក់"><span></span></label></div></div></form>';
+  var foot = isNew ? '<button class="btn ghost" type="button" data-act="closeSheet">បោះបង់</button><button class="btn" type="submit" form="sf" data-write>បន្ថែមគណនី</button>' :
+    '<button class="btn danger" type="button" data-write data-act="delAccount" data-i="' + idx + '">លុប</button><button class="btn" type="submit" form="sf" data-write>រក្សាទុក</button>';
+  openSheet('account', isNew ? 'គណនីថ្មី' : a.title, body, foot, {idx:idx, images:(a.images || []).slice()});
+  renderAcctThumbs();
+  if(!S.canWrite) $$('#sf input,#sf select,#sf textarea').forEach(function(x){ x.disabled = true; });
+}
+function renderAcctThumbs(){
+  var el = $('#a-thumbs'); if(!el || !S.sheet) return;
+  el.innerHTML = S.sheet.ctx.images.map(function(u, i){
+    return '<span class="th"><img src="' + esc(u) + '" alt=""><button type="button" data-write data-act="rmAcctImg" data-i="' + i + '" aria-label="ដករូប">×</button></span>';
+  }).join('');
+}
+function acctImgsPicked(input){
+  var files = Array.prototype.slice.call(input.files || []); input.value = '';
+  var ctx = S.sheet && S.sheet.ctx; if(!ctx) return;
+  var room = 8 - ctx.images.length;
+  if(room <= 0){ toast('អតិបរមា ៨ រូប', true); return; }
+  runSeq(files.slice(0, room), function(f){
+    return resizeImage(f, 900, .78).then(function(u){ ctx.images.push(u); renderAcctThumbs(); });
+  }).then(null, function(){ toast('មិនអាចអានរូបមួយចំនួនបានទេ', true); });
+}
+function saveAccountFromForm(){
+  clearErrs();
+  var ctx = S.sheet.ctx, title = $('#a-title').value.trim(), usdv = $('#a-usd').value, bad = false;
+  if(!title){ setErr('a-title', 'សូមបញ្ចូលចំណងជើង'); bad = true; }
+  if(usdv === '' || !(Number(usdv) >= 0)){ setErr('a-usd', 'សូមបញ្ចូលតម្លៃ'); bad = true; }
+  if(bad){ (title ? $('#a-usd') : $('#a-title')).focus(); return; }
+  var a = {game:$('#a-game').value, title:title, usd:round2(Number(usdv)),
+    specs:$('#a-specs').value.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean), images:ctx.images.slice(), on:$('#a-on').checked};
+  commitConfig(function(c){ if(ctx.idx >= 0) c.accounts[ctx.idx] = a; else c.accounts.push(a); }, ctx.idx >= 0 ? 'បានរក្សាទុក' : 'បានបន្ថែមគណនី').then(function(ok){ if(ok) closeSheet(); });
+}
+
+/* ---------- Banner sheet ---------- */
+function openBannerSheet(b, idx){
+  var isNew = idx < 0;
+  var gopts = '<option value="">— គ្មាន —</option>' + S.cfg.games.map(function(g){ return '<option value="' + esc(g.id) + '"' + (g.id === b.game ? ' selected' : '') + '>' + esc(g.name + ' ' + g.region) + '</option>'; }).join('');
+  var body = '<form id="sf" novalidate><div class="fgrid">' +
+    imgField('bn-img', 'រូប Banner', b.img, {wide:true, max:1200, hint:'ទំហំណែនាំ 1000×600 (សមាមាត្រ 5:3)។'}) +
+    '<div class="fld"><label for="bn-game">ចុចហើយទៅកាន់ហ្គេម</label><select id="bn-game">' + gopts + '</select></div>' +
+    fld('bn-url', 'ឬតំណ (https://...)', b.url || '', {hint:'ប្រើតែពេលមិនបានជ្រើសហ្គេម។'}) +
+    '<div class="frow"><span>បង្ហាញក្នុងហាង</span><label class="sw"><input type="checkbox" id="bn-on"' + (b.on !== false ? ' checked' : '') + ' aria-label="បង្ហាញ"><span></span></label></div></div></form>';
+  var foot = isNew ? '<button class="btn ghost" type="button" data-act="closeSheet">បោះបង់</button><button class="btn" type="submit" form="sf" data-write>បន្ថែម</button>' :
+    '<button class="btn danger" type="button" data-write data-act="delBanner" data-i="' + idx + '">លុប</button><button class="btn" type="submit" form="sf" data-write>រក្សាទុក</button>';
+  openSheet('banner', isNew ? 'Banner ថ្មី' : 'Banner ' + (idx + 1), body, foot, {idx:idx});
+  if(!S.canWrite) $$('#sf input,#sf select').forEach(function(x){ x.disabled = true; });
+}
+function saveBannerFromForm(){
+  clearErrs();
+  var ctx = S.sheet.ctx, img = $('#bn-img').value, url = $('#bn-url').value.trim();
+  if(!img){ toast('សូមជ្រើសរូប Banner', true); return; }
+  if(url && !/^https?:\/\//i.test(url)){ setErr('bn-url', 'តំណត្រូវចាប់ផ្តើមដោយ https://'); $('#bn-url').focus(); return; }
+  var b = {img:img, game:$('#bn-game').value, url:url, on:$('#bn-on').checked};
+  commitConfig(function(c){ if(ctx.idx >= 0) c.banners[ctx.idx] = b; else c.banners.push(b); }, 'បានរក្សាទុក').then(function(ok){ if(ok) closeSheet(); });
+}
+
+/* ---------- Payment method sheet ---------- */
+function openPaySheet(p, isNew){
+  openSheet('pay', isNew ? 'វិធីបង់ថ្មី' : p.name,
+    '<form id="sf" novalidate><div class="fgrid">' + fld('p-name', 'ឈ្មោះ', p.name) + fld('p-desc', 'សេចក្តីពន្យល់', p.desc) + imgField('p-img', 'រូបធនាគារ / Logo', p.img, {max:160, hint:'ទទេ = ប្រើអក្សរកាត់ និងពណ៌ខាងក្រោម។'}) +
+    '<div class="fgrid two">' + fld('p-mono', 'អក្សរកាត់ក្នុងប្រអប់', p.mono, {max:3}) + '<div class="fld"><label for="p-tint">ពណ៌</label><input id="p-tint" type="color" value="' + esc(p.tint || '#3355F5') + '"></div></div></div></form>',
+    '<button class="btn ghost" type="button" data-act="closeSheet">បោះបង់</button><button class="btn" type="submit" form="sf" data-write>' + (isNew ? 'បន្ថែម' : 'រក្សាទុក') + '</button>', {isNew:isNew, orig:p});
+  if(!S.canWrite) $$('#sf input').forEach(function(x){ x.disabled = true; });
+}
+function savePayFromForm(){
+  clearErrs();
+  var ctx = S.sheet.ctx, name = $('#p-name').value.trim();
+  if(!name){ setErr('p-name', 'សូមបញ្ចូលឈ្មោះ'); $('#p-name').focus(); return; }
+  var p = Object.assign({}, ctx.orig, {name:name, desc:$('#p-desc').value.trim(), mono:($('#p-mono').value.trim() || name.slice(0, 2)).toUpperCase(), tint:$('#p-tint').value, img:$('#p-img').value});
+  if(ctx.isNew){ var id = slug(name) || 'pay', k = 2, base = id; while(S.cfg.pays.some(function(x){ return x.id === id; })) id = base + '-' + k++; p.id = id; p.on = true; }
+  commitConfig(function(c){
+    var i = c.pays.findIndex(function(x){ return x.id === p.id; });
+    if(i >= 0) c.pays[i] = p; else c.pays.push(p);
+  }, 'បានរក្សាទុក').then(function(ok){ if(ok) closeSheet(); });
+}
+
+/* ---------- KHQR test ---------- */
+function tlv(tag, val){ val = String(val); return tag + ('0' + val.length).slice(-2) + val; }
+function crc16(str){
+  var crc = 0xFFFF;
+  for(var i = 0; i < str.length; i++){
+    crc ^= str.charCodeAt(i) << 8;
+    for(var j = 0; j < 8; j++){ crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1); crc &= 0xFFFF; }
+  }
+  return ('0000' + crc.toString(16).toUpperCase()).slice(-4);
+}
+function ascii(t, max){ return String(t).replace(/[^\x20-\x7E]/g, '').slice(0, max); }
+function buildKHQR(o){
+  var isKHR = o.currency === 'KHR', exp = o.now + o.expireMin * 60000;
+  var acct = (o.merchantId && o.bank) ? tlv('30', tlv('00', o.account) + tlv('01', o.merchantId) + tlv('02', o.bank)) : tlv('29', tlv('00', o.account));
+  var amt = isKHR ? String(Math.round(o.amount)) : Number(o.amount).toFixed(2);
+  var q = tlv('00', '01') + tlv('01', '12') + acct + tlv('52', o.mcc || '5999') + tlv('53', isKHR ? '116' : '840') + tlv('54', amt) + tlv('58', 'KH') +
+    tlv('59', ascii(o.name, 25)) + tlv('60', ascii(o.city, 15));
+  if(o.bill) q += tlv('62', tlv('01', ascii(o.bill, 25)));
+  q += tlv('99', tlv('00', String(o.now)) + tlv('01', String(exp)));
+  q += '6304'; return q + crc16(q);
+}
+var qrLoading = null;
+function ensureQR(cb){
+  if(typeof qrcode === 'function'){ cb(true); return; }
+  if(!qrLoading){
+    qrLoading = new Promise(function(res){
+      var sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+      sc.onload = function(){ res(typeof qrcode === 'function'); }; sc.onerror = function(){ res(false); }; document.head.appendChild(sc);
+    });
+  }
+  qrLoading.then(cb);
+}
+function qrDataURL(text){
+  var qr = qrcode(0, 'Q'); qr.addData(text); qr.make();
+  var n = qr.getModuleCount(), cell = 8, size = (n + 8) * cell, cv = document.createElement('canvas'); cv.width = cv.height = size;
+  var x = cv.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, size, size); x.fillStyle = '#000';
+  for(var r = 0; r < n; r++) for(var k = 0; k < n; k++) if(qr.isDark(r, k)) x.fillRect((k + 4) * cell, (r + 4) * cell, cell, cell);
+  return cv.toDataURL('image/png');
+}
+function openQrTest(){
+  var k = S.cfg.khqr, demo = !k.account;
+  var payload = buildKHQR({account:k.account || 'your_account@bank', name:k.name, city:k.city, currency:k.currency, amount:1, bill:'TEST-001', now:Date.now(), expireMin:k.expireMin, mcc:k.mcc, merchantId:k.merchantId, bank:k.bank});
+  openSheet('qr', 'សាកល្បង QR',
+    '<div class="qrwrap"><div id="qrHolder" class="muted">កំពុងបង្កើត...</div><p><b>' + (k.currency === 'KHR' ? '៛4,100' : '$1.00') + '</b> · ' + esc(k.name) + '</p>' +
+    (demo ? '<p class="banner ro" style="margin:0">មិនទាន់មាន Bakong Account ID ទេ QR នេះជាគំរូ។</p>' : '<p class="muted" style="text-align:center">ស្កេនជាមួយកម្មវិធីធនាគារ ហើយពិនិត្យថាឈ្មោះ និងចំនួនទឹកប្រាក់ត្រឹមត្រូវ មុនបើកលក់ពិត។</p>') +
+    '<pre class="code" style="width:100%">' + esc(payload) + '</pre></div>',
+    '<button class="btn ghost" type="button" data-act="closeSheet">បិទ</button><button class="btn" type="button" data-act="copyPayload">ចម្លងអត្ថបទ QR</button>', {payload:payload});
+  ensureQR(function(ok){
+    var h = $('#qrHolder'); if(!h) return;
+    if(!ok){ h.textContent = 'មិនអាចបង្កើតរូប QR បានទេ (ត្រូវការអ៊ីនធឺណិត)'; return; }
+    try{ h.innerHTML = '<img alt="KHQR សាកល្បង" src="' + qrDataURL(payload) + '">'; }catch(e){ h.textContent = 'មិនអាចបង្កើតរូប QR បានទេ'; }
+  });
+}
+
+/* ---------- Restore ---------- */
+function openRestore(){
+  openSheet('restore', 'ស្តារពី Backup',
+    '<form id="sf" novalidate><div class="fgrid"><p class="muted">ការស្តារនឹងជំនួសការកំណត់ និងបន្ថែម/ជំនួសបញ្ជាទិញដែលមានលេខដូចគ្នា។</p>' +
+    '<div class="fld"><label for="r-file">ជ្រើសឯកសារ .json</label><input id="r-file" type="file" accept=".json,application/json"></div>' +
+    '<div class="fld"><label for="r-text">ឬបិទភ្ជាប់ JSON</label><textarea id="r-text" autocomplete="off" style="min-height:120px"></textarea><p class="err" data-err="r-text"></p></div></div></form>',
+    '<button class="btn ghost" type="button" data-act="closeSheet">បោះបង់</button><button class="btn" type="submit" form="sf">ស្តារ</button>');
+  $('#r-file').addEventListener('change', function(){
+    var f = this.files && this.files[0]; if(!f) return;
+    var rd = new FileReader(); rd.onload = function(){ $('#r-text').value = String(rd.result || ''); }; rd.readAsText(f);
+  });
+}
+function doRestore(){
+  clearErrs();
+  var data; try{ data = JSON.parse($('#r-text').value); }catch(e){ setErr('r-text', 'JSON មិនត្រឹមត្រូវ'); return; }
+  if(!data || (!data.config && !data.orders)){ setErr('r-text', 'មិនមែនឯកសារ Backup របស់ Julian Topup ទេ'); return; }
+  var orders = Array.isArray(data.orders) ? data.orders.filter(function(o){ return o && /^[A-Za-z0-9-]{3,30}$/.test(o.id || '') && o.createdAt; }) : [];
+  askConfirm('ស្តារទិន្នន័យ?', 'នឹងស្តារ ' + (data.config ? 'ការកំណត់ និង ' : '') + orders.length + ' បញ្ជាទិញ។', 'ស្តារ').then(function(yes){
+    if(!yes) return;
+    closeSheet();
+    var p = Promise.resolve(true);
+    if(data.config){ var cfg = normalizeConfig(data.config); p = commitConfig(function(c){ Object.keys(c).forEach(function(k){ delete c[k]; }); Object.assign(c, cfg); }); }
+    p.then(function(){ return runSeq(orders, function(o){ return Promise.resolve(store.saveOrder(o)); }); }).then(function(){
+      if(S.mode !== 'shared') renderAll(true); toast('បានស្តារទិន្នន័យ');
+    }, function(e){ toast(failMsg(e), true); });
+  });
+}
+function runSeq(list, fn){
+  var i = 0;
+  return new Promise(function(res, rej){
+    (function next(){ if(i >= list.length) return res(); Promise.resolve(fn(list[i++])).then(next, rej); })();
+  });
+}
+
+/* =====================================================================
+   Actions (event delegation)
+   ===================================================================== */
+var ACT = {
+  tab: function(el){ setTab(el.dataset.v); },
+  range: function(el){ S.range = el.dataset.v; renderView(); },
+  ofilter: function(el){ S.ofilter = el.dataset.v; S.olimit = 60; renderView(); },
+  moreOrders: function(){ S.olimit += 60; $('#olistWrap').innerHTML = ordersListHTML(); },
+  closeSheet: closeSheet,
+  newOrder: function(){ if(guard()) openOrderSheet(newOrderTemplate(), true); },
+  openOrder: function(el){ var o = findOrder(el.dataset.id); if(o) openOrderSheet(clone(o), false); },
+  setStatus: function(el){ setOrderStatus(el.dataset.id, el.dataset.s); },
+  delOrder: function(el){
+    var id = el.dataset.id;
+    askConfirm('លុបបញ្ជាទិញ ' + id + '?', 'មិនអាចត្រឡប់វិញបានទេ។', 'លុប').then(function(y){ if(y) removeOrder(id, 'បានលុបបញ្ជាទិញ').then(function(ok){ if(ok) closeSheet(); }); });
+  },
+  copyDelivery: function(el){ var o = findOrder(el.dataset.id); if(o) copyText(deliveryMessage(o), 'បានចម្លងសារដឹកជញ្ជូន'); },
+  exportOrders: function(){
+    var list = filteredOrders(); if(!list.length){ toast('គ្មានបញ្ជាទិញត្រូវទាញយកទេ', true); return; }
+    saveFile('orders-' + new Date().toISOString().slice(0, 10) + '.csv', ordersCSV(list));
+  },
+  newGame: function(){ if(guard()) openGameSheet(newGameTemplate(), true); },
+  editGame: function(el){ var g = gameById(el.dataset.id); if(g) openGameSheet(clone(g), false); },
+  moveGame: function(el){
+    var id = el.dataset.id, d = Number(el.dataset.d);
+    commitConfig(function(c){
+      var i = c.games.findIndex(function(x){ return x.id === id; }), j = i + d;
+      if(i < 0 || j < 0 || j >= c.games.length) return;
+      var t = c.games[i]; c.games[i] = c.games[j]; c.games[j] = t;
+    });
+  },
+  delGame: function(el){
+    var id = el.dataset.id, g = gameById(id);
+    askConfirm('លុបហ្គេម ' + (g ? (g.short || g.name) : '') + '?', 'បញ្ជាទិញចាស់ៗនៅតែរក្សាទុក។ អ្នកអាចបិទលក់ជំនួសការលុបបាន។', 'លុប').then(function(y){
+      if(y) commitConfig(function(c){ c.games = c.games.filter(function(x){ return x.id !== id; }); }, 'បានលុបហ្គេម').then(function(ok){ if(ok) closeSheet(); });
+    });
+  },
+  dupGame: function(el){
+    var g = gameById(el.dataset.id); if(!g) return;
+    var n = clone(g), base = g.id + '-copy', id = base, k = 2; while(gameById(id)) id = base + k++;
+    n.id = id; n.short = g.short + ' (ចម្លង)'; n.on = false;
+    commitConfig(function(c){ var i = c.games.findIndex(function(x){ return x.id === g.id; }); c.games.splice(i + 1, 0, n); }, 'បានចម្លងហ្គេម (បិទលក់ជាមុន)').then(function(ok){ if(ok) closeSheet(); });
+  },
+  addPack: function(){
+    var wrap = $('#packRows'); var d = document.createElement('div'); d.innerHTML = packRow({a:'', p:''}, 0, false);
+    wrap.appendChild(d.firstChild); var inputs = $$('.p-a', wrap); inputs[inputs.length - 1].focus();
+  },
+  delPack: function(el){
+    var row = el.closest('.prow'), wasPop = $('.p-pop', row).checked; row.remove();
+    if(wasPop){ var f = $('#packRows .p-pop'); if(f) f.checked = true; }
+  },
+  sortPacks: function(){
+    var rows = $$('#packRows .prow'), items = rows.map(function(r){ return {el:r, a:Number($('.p-a', r).value) || 1e12}; });
+    items.sort(function(x, y){ return x.a - y.a; }); items.forEach(function(it){ $('#packRows').appendChild(it.el); });
+  },
+  bulkPrice: function(){ if(guard()) openBulkPrice(); },
+  newPay: function(){ if(guard()) openPaySheet({id:'', name:'', desc:'', mono:'', tint:'#3355F5', on:true}, true); },
+  editPay: function(el){ var p = S.cfg.pays.filter(function(x){ return x.id === el.dataset.id; })[0]; if(p) openPaySheet(clone(p), false); },
+  delPay: function(el){
+    var id = el.dataset.id, p = S.cfg.pays.filter(function(x){ return x.id === id; })[0];
+    askConfirm('លុបវិធីបង់ ' + (p ? p.name : '') + '?', '', 'លុប').then(function(y){ if(y) commitConfig(function(c){ c.pays = c.pays.filter(function(x){ return x.id !== id; }); }, 'បានលុប'); });
+  },
+  testQR: openQrTest,
+  newAccount: function(){ if(guard()) openAccountSheet({game:(S.cfg.games[0] || {}).id || '', title:'', specs:[], usd:'', images:[], on:true}, -1); },
+  editAccount: function(el){ var i = Number(el.dataset.i), a = S.cfg.accounts[i]; if(a) openAccountSheet(clone(a), i); },
+  moveAccount: function(el){ moveIn('accounts', Number(el.dataset.i), Number(el.dataset.d)); },
+  delAccount: function(el){
+    var i = Number(el.dataset.i);
+    askConfirm('លុបគណនីនេះ?', 'មិនអាចត្រឡប់វិញបានទេ។ អ្នកអាចបិទលក់ជំនួសបាន។', 'លុប').then(function(y){
+      if(y) commitConfig(function(c){ c.accounts.splice(i, 1); }, 'បានលុប').then(function(ok){ if(ok) closeSheet(); });
+    });
+  },
+  newBanner: function(){ if(guard()) openBannerSheet({img:'', game:'', url:'', on:true}, -1); },
+  editBanner: function(el){ var i = Number(el.dataset.i), b = S.cfg.banners[i]; if(b) openBannerSheet(clone(b), i); },
+  moveBanner: function(el){ moveIn('banners', Number(el.dataset.i), Number(el.dataset.d)); },
+  delBanner: function(el){
+    var i = Number(el.dataset.i);
+    askConfirm('លុប Banner នេះ?', '', 'លុប').then(function(y){
+      if(y) commitConfig(function(c){ c.banners.splice(i, 1); }, 'បានលុប').then(function(ok){ if(ok) closeSheet(); });
+    });
+  },
+  clearImg: function(el){ setImg(el.dataset.id, ''); },
+  clearPackImg: function(el){ var c = el.closest('.pimg'); $('.p-img', c).value = ''; $('.pimg-prev', c).textContent = '+'; c.classList.remove('has'); },
+  rmAcctImg: function(el){ S.sheet.ctx.images.splice(Number(el.dataset.i), 1); renderAcctThumbs(); },
+  resetTexts: function(){
+    askConfirm('ត្រឡប់អក្សរទៅលំនាំដើម?', 'អក្សរដែលបានកែនឹងត្រូវជំនួសដោយអក្សរដើម។', 'ត្រឡប់').then(function(y){ if(y) commitConfig(function(c){ c.site.t = {}; }, 'បានត្រឡប់លំនាំដើម'); });
+  },
+  copyPayload: function(){ copyText(S.sheet.ctx.payload, 'បានចម្លងអត្ថបទ QR'); },
+  copyCfg: function(){ copyText(JSON.stringify(storefrontConfig()), 'បានចម្លង Config'); },
+  dlCfg: function(){ saveFile('jt-config.json', JSON.stringify(storefrontConfig(), null, 2)); },
+  backup: function(){
+    saveFile('julian-topup-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({app:'julian-topup-admin', v:1, exportedAt:Date.now(), config:S.cfg, orders:S.orders}, null, 2));
+  },
+  restore: function(){ if(guard()) openRestore(); },
+  addDemo: function(){
+    if(!guard()) return;
+    var games = S.cfg.games.filter(function(g){ return g.packs.length; }); if(!games.length){ toast('គ្មានហ្គេមទេ', true); return; }
+    var statuses = ['delivered','delivered','delivered','paid','pending','delivered','cancelled','delivered','paid','delivered','pending','delivered'];
+    var list = statuses.map(function(st, i){
+      var g = games[i % games.length], p = g.packs[(i * 2 + 1) % g.packs.length], t = Date.now() - i * 7.5 * 3600e3 - Math.random() * 3600e3;
+      var pid = String(100000000 + Math.floor(Math.random() * 899999999));
+      return {id:'DEMO-' + genCode().slice(3), gameId:g.id, gameName:g.name, region:g.region, unit:g.unit, idLabel:g.idType === 'text' ? 'Username' : 'Player ID',
+        pid:g.idType === 'text' ? 'player' + (i + 1) : pid, sid:g.server ? String(1000 + i * 37) : '', amount:p.a, usd:p.p, method:(S.cfg.pays[i % S.cfg.pays.length] || {}).name || 'KHQR',
+        status:st, customer:'', note:'ទិន្នន័យគំរូ', createdAt:Math.round(t), updatedAt:Date.now(), log:[{s:st, t:Math.round(t)}]};
+    });
+    runSeq(list, function(o){ return store.saveOrder(o); }).then(function(){ if(S.mode !== 'shared') renderAll(true); toast('បានបន្ថែមបញ្ជាទិញគំរូ ១២'); }, function(e){ toast(failMsg(e), true); });
+  },
+  delDemo: function(){
+    var ids = S.orders.filter(function(o){ return /^DEMO-/.test(o.id); }).map(function(o){ return o.id; });
+    askConfirm('លុបបញ្ជាទិញគំរូ ' + ids.length + '?', '', 'លុប').then(function(y){
+      if(y) runSeq(ids, function(id){ return store.deleteOrder(id); }).then(function(){ if(S.mode !== 'shared') renderAll(true); toast('បានលុប'); }, function(e){ toast(failMsg(e), true); });
+    });
+  },
+  purgeOld: function(){
+    var cutoff = Date.now() - 90 * 864e5, ids = S.orders.filter(function(o){ return o.createdAt < cutoff; }).map(function(o){ return o.id; });
+    if(!ids.length){ toast('គ្មានបញ្ជាទិញចាស់ជាង ៩០ ថ្ងៃទេ'); return; }
+    askConfirm('លុបបញ្ជាទិញចាស់ ' + ids.length + '?', 'សូមទាញយក Backup ជាមុន ព្រោះមិនអាចត្រឡប់វិញបានទេ។', 'លុប').then(function(y){
+      if(y) runSeq(ids, function(id){ return store.deleteOrder(id); }).then(function(){ if(S.mode !== 'shared') renderAll(true); toast('បានលុប ' + ids.length + ' បញ្ជាទិញ'); }, function(e){ toast(failMsg(e), true); });
+    });
+  },
+  resetCfg: function(){
+    askConfirm('កំណត់ការកំណត់ឡើងវិញ?', 'ហ្គេម តម្លៃ វិធីបង់ និង KHQR នឹងត្រឡប់ទៅលំនាំដើម។ បញ្ជាទិញមិនត្រូវបានលុបទេ។', 'កំណត់ឡើងវិញ').then(function(y){
+      if(y) commitConfig(function(c){ var d = defaultConfig(); Object.keys(c).forEach(function(k){ delete c[k]; }); Object.assign(c, d); }, 'បានកំណត់ឡើងវិញ');
+    });
+  }
+};
+var CHG = {
+  toggleGame: function(el){ var id = el.dataset.id, on = el.checked; commitConfig(function(c){ var g = c.games.filter(function(x){ return x.id === id; })[0]; if(g) g.on = on; }, on ? 'បើកលក់' : 'បិទលក់'); },
+  togglePay: function(el){ var id = el.dataset.id, on = el.checked; commitConfig(function(c){ var p = c.pays.filter(function(x){ return x.id === id; })[0]; if(p) p.on = on; }); },
+  toggleTicker: function(el){ var on = el.checked; commitConfig(function(c){ c.ticker.on = on; }); },
+  toggleAccount: function(el){ var i = Number(el.dataset.i), on = el.checked; commitConfig(function(c){ if(c.accounts[i]) c.accounts[i].on = on; }, on ? 'បើកលក់' : 'បិទលក់'); },
+  toggleBanner: function(el){ var i = Number(el.dataset.i), on = el.checked; commitConfig(function(c){ if(c.banners[i]) c.banners[i].on = on; }); }
+};
+
+document.addEventListener('click', function(e){
+  var t = e.target.closest('[data-act]'); if(t && ACT[t.dataset.act]){ e.preventDefault(); ACT[t.dataset.act](t); return; }
+  var tab = e.target.closest('[data-tab]'); if(tab){ setTab(tab.dataset.tab); }
+});
+document.addEventListener('change', function(e){
+  var t = e.target.closest('[data-change]'); if(t && CHG[t.dataset.change]){ CHG[t.dataset.change](t); return; }
+  if(e.target.matches('[data-imgfile]')){ imgPicked(e.target); return; }
+  if(e.target.matches('[data-pfile]')){ packImgPicked(e.target); return; }
+  if(e.target.matches('[data-imgurl]')){ setImg(e.target.dataset.imgurl, e.target.value.trim()); return; }
+  if(e.target.id === 'a-imgfiles'){ acctImgsPicked(e.target); return; }
+  if(e.target.id === 'pub-file'){ publishFile(e.target); return; }
+  if(e.target.id === 'f-game'){ refreshOrderGameFields(null, false); }
+  else if(e.target.id === 'f-pack'){
+    var g = gameById($('#f-game').value), v = e.target.value;
+    if(g && v !== ''){ var p = g.packs[Number(v)]; if(p){ $('#f-amount').value = p.a; $('#f-usd').value = p.p.toFixed(2); $('#f-unit').value = g.unit; } }
+  }
+});
+document.addEventListener('input', function(e){
+  if(e.target.id === 'oq'){ S.oq = e.target.value; S.olimit = 60; $('#olistWrap').innerHTML = ordersListHTML(); }
+  else if(e.target.id === 'f-paste'){
+    var r = parseReceipt(e.target.value); if(!r.code && !r.pid && !r.pack) return;
+    if(r.code) $('#f-code').value = r.code;
+    if(r.gameId){ $('#f-game').value = r.gameId; refreshOrderGameFields(null, false); }
+    else if(r.game){ $('#f-game').value = '_other'; refreshOrderGameFields(null, false); $('#f-gname').value = r.game; }
+    if(r.pid) $('#f-pid').value = r.pid;
+    if(r.sid) $('#f-sid').value = r.sid;
+    if(r.amount) $('#f-amount').value = r.amount;
+    if(r.unit) $('#f-unit').value = r.unit;
+    if(r.usd != null) $('#f-usd').value = r.usd.toFixed(2);
+    if(r.method){ var sel = $('#f-method'); var has = $$('option', sel).some(function(o){ return o.value.toLowerCase() === r.method.toLowerCase(); }); if(!has){ var op = document.createElement('option'); op.value = op.textContent = r.method; sel.appendChild(op); } $$('option', sel).forEach(function(o){ if(o.value.toLowerCase() === r.method.toLowerCase()) sel.value = o.value; }); }
+    if(r.status) $('#f-status').value = r.status;
+    if(r.createdAt) $('#f-time').value = toLocalInput(r.createdAt);
+    if(r.gameId){ var gg = gameById(r.gameId), am = Number(r.amount), us = Number(r.usd); gg.packs.forEach(function(p, i){ if(p.a === am) $('#f-pack').value = String(i); }); }
+  }
+});
+document.addEventListener('submit', function(e){
+  e.preventDefault();
+  var id = e.target.id;
+  if(id === 'sf' && S.sheet){
+    if(!guard()) return;
+    var ty = S.sheet.type;
+    if(ty === 'order') saveOrderFromForm(); else if(ty === 'game') saveGameFromForm(); else if(ty === 'bulk') applyBulk(); else if(ty === 'pay') savePayFromForm(); else if(ty === 'restore') doRestore(); else if(ty === 'account') saveAccountFromForm(); else if(ty === 'banner') saveBannerFromForm();
+  } else if(id === 'formShop') saveShop();
+  else if(id === 'formKhqr') saveKhqr();
+  else if(id === 'formLook') saveLook();
+});
+
+function injectConfig(html, cfg){
+  var re = /(<script[^>]*id=["']jt-config["'][^>]*>)([\s\S]*?)(<\/script>)/i;
+  if(!re.test(html)) return null;
+  var json = JSON.stringify(cfg).replace(/</g, '\\u003c');
+  return html.replace(re, function(m, a1, b1, c1){ return a1 + json + c1; });
+}
+function publishFile(input){
+  var file = input.files && input.files[0], msg = $('#pub-msg'); if(!file) return;
+  msg.style.color = 'var(--muted)'; msg.textContent = 'កំពុងអាន...';
+  file.text().then(function(html){
+    var out = injectConfig(html, storefrontConfig());
+    if(!out){ msg.style.color = ''; msg.textContent = 'ឯកសារនេះមិនមានកន្លែងទទួល Config (jt-config) ទេ។ សូមប្រើកំណែថ្មីបំផុតនៃឯកសារហាង Julian Topup។'; input.value = ''; return; }
+    var name = file.name || 'index.html', sc = storefrontConfig();
+    input.value = '';
+    return saveFile(name, out).then(function(){
+      msg.style.color = 'var(--ok)';
+      msg.textContent = 'រួចរាល់! ' + sc.games.length + ' ហ្គេម · ' + sc.pays.length + ' វិធីបង់។ ឥឡូវ upload ឯកសារ ' + name + ' ទៅ hosting។';
+    });
+  }, function(){ msg.style.color = ''; msg.textContent = 'មិនអាចអានឯកសារបានទេ'; });
+}
+
+function saveShop(){
+  ['s-tg', 's-rate'].forEach(function(i){ setErr(i, ''); });
+  var name = $('#s-name').value.trim() || 'Julian Topup';
+  var tg = $('#s-tg').value.trim().replace(/^https?:\/\/t\.me\//i, '').replace(/^@/, ''), rate = Number($('#s-rate').value), bad = false;
+  if(!/^[A-Za-z0-9_]{5,32}$/.test(tg)){ setErr('s-tg', 'ឈ្មោះ Telegram ៥-៣២ តួ (អក្សរ លេខ _)'); bad = true; }
+  if(!(rate >= 1000 && rate <= 10000)){ setErr('s-rate', 'អត្រាត្រូវនៅចន្លោះ 1,000 ដល់ 10,000'); bad = true; }
+  if(bad) return;
+  commitConfig(function(c){ c.shop.name = name; c.shop.telegram = tg; c.shop.rate = Math.round(rate); }, 'បានរក្សាទុកការកំណត់ហាង');
+}
+function saveKhqr(){
+  ['k-acc', 'k-name', 'k-exp'].forEach(function(i){ setErr(i, ''); });
+  var acc = $('#k-acc').value.trim(), name = ascii($('#k-name').value.trim() || 'Julian Topup', 25), exp = Number($('#k-exp').value), bad = false;
+  if(acc && !/^[A-Za-z0-9._-]+@[A-Za-z0-9]+$/.test(acc)){ setErr('k-acc', 'ទម្រង់ត្រូវជា ឈ្មោះ@ធនាគារ ឧ. julian@aba'); bad = true; }
+  if(!name){ setErr('k-name', 'ត្រូវជាអក្សរឡាតាំង'); bad = true; }
+  if(!(exp >= 1 && exp <= 1440)){ setErr('k-exp', 'ចន្លោះ ១ ដល់ ១៤៤០ នាទី'); bad = true; }
+  var mid = $('#k-mid').value.trim(), bank = $('#k-bank').value.trim();
+  if(bad) return;
+  commitConfig(function(c){
+    c.khqr = {account:acc, name:name, city:ascii($('#k-city').value.trim() || 'Phnom Penh', 15), currency:$('#k-cur').value, expireMin:Math.round(exp), mcc:($('#k-mcc').value.trim() || '5999'), merchantId:mid, bank:bank};
+  }, 'បានរក្សាទុក KHQR');
+}
+
+/* theme */
+try{ var th = localStorage.getItem('jt-admin:theme'); if(th) document.documentElement.setAttribute('data-theme', th); }catch(e){}
+$('#themeBtn').addEventListener('click', function(){
+  var root = document.documentElement;
+  var cur = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  var next = cur === 'dark' ? 'light' : 'dark'; root.setAttribute('data-theme', next);
+  try{ localStorage.setItem('jt-admin:theme', next); }catch(e){}
+});
+
+/* =====================================================================
+   Boot: shared db inside Claude, local storage anywhere else
+   ===================================================================== */
+function ready(){
+  $('#boot').hidden = true; $('#app').hidden = false;
+  document.body.classList.toggle('ro', !S.canWrite);
+  renderAll();
+}
+function startLocal(){
+  if(S.mode !== 'boot') return;
+  S.mode = 'local'; store = makeLocalStore(); store.init(ready);
+}
+function startShared(db){
+  if(S.mode !== 'boot') return;
+  S.mode = 'shared';
+  var settle = function(){
+    store = makeSharedStore(db);
+    var guardTimer = setTimeout(function(){ ready(); }, 5000);
+    store.init(function(){ clearTimeout(guardTimer); ready(); });
+  };
+  var uP = Promise.resolve(null);
+  try{ uP = window.claude.use('user'); }catch(e){}
+  Promise.race([uP, new Promise(function(r){ setTimeout(function(){ r(null); }, 2500); })]).then(function(u){
+    if(!u) return null;
+    return Promise.resolve(u.canEdit()).then(function(v){ S.canWrite = v !== false; }, function(){});
+  }).then(settle, settle);
+}
+function boot(){
+  var hasClaude = false;
+  try{ hasClaude = !!(window.claude && typeof window.claude.use === 'function'); }catch(e){}
+  if(!hasClaude){ startLocal(); return; }
+  var timer = setTimeout(startLocal, 6000);
+  window.claude.use('db').then(function(db){
+    clearTimeout(timer);
+    if(S.mode !== 'boot') return;
+    if(!db) startLocal(); else startShared(db);
+  }, function(){ clearTimeout(timer); startLocal(); });
+}
+/* =====================================================================
+   Server store: Vercel /api/admin  (login + Upstash Redis)
+   ===================================================================== */
+var TOKEN_KEY = 'jt-admin:token', token = '';
+try{ token = sessionStorage.getItem(TOKEN_KEY) || ''; }catch(e){}
+function showLogin(){
+  $('#boot').hidden = true; $('#app').hidden = true; $('#login').hidden = false;
+  setTimeout(function(){ $('#lg-pw').focus(); }, 50);
+}
+function api(action, data){
+  return fetch('/api/admin', {method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer ' + token},
+    body:JSON.stringify(Object.assign({action:action}, data || {}))})
+  .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){
+    if(r.status === 401 && action !== 'login') showLogin();
+    if(!r.ok){ var e = new Error(j.message || j.error || ('HTTP ' + r.status)); e.code = j.error; e.msg = j.message; throw e; }
+    return j;
+  }); });
+}
+function uploadAll(obj){
+  var jobs = [], cache = {};
+  (function walk(o){
+    if(!o || typeof o !== 'object') return;
+    Object.keys(o).forEach(function(k){
+      var v = o[k];
+      if(typeof v === 'string' && /^data:image\//.test(v)) jobs.push({o:o, k:k, v:v}); else walk(v);
+    });
+  })(obj);
+  return jobs.reduce(function(p, j){ return p.then(function(){
+    if(cache[j.v]){ j.o[j.k] = cache[j.v]; return; }
+    return api('upload', {data:j.v}).then(function(r){ cache[j.v] = r.url; j.o[j.k] = r.url; });
+  }); }, Promise.resolve());
+}
+function toApi(c){
+  var on = function(x){ return x.on !== false; };
+  var games = c.games.filter(function(g){ return on(g) && g.packs.length; }).map(function(g){
+    return {id:g.id, short:g.short, name:g.name, region:g.region, mono:g.mono, tint:g.tint, unit:g.unit, unitKm:g.unitKm, vizo:g.vizo || '',
+      server:!!g.server, idType:g.idType, pop:g.pop, img:g.img || '', packImg:g.packImg || '',
+      packs:g.packs.map(function(p){ return [p.a, p.p, p.img || '']; })};
+  });
+  var ids = {}; games.forEach(function(g){ ids[g.id] = 1; });
+  var bn = (c.banners || []).filter(function(b){ return on(b) && b.img; });
+  return {
+    telegram:c.shop.telegram, rate:c.shop.rate, logo:c.site.logoTopup || '', banner:bn.length ? bn[0].img : '', khqr:c.khqr,
+    pays:c.pays.filter(on).map(function(p){ return {name:p.name, desc:p.desc, mono:p.mono, tint:p.tint, img:p.img || ''}; }),
+    games:games,
+    accounts:c.accounts.filter(function(a){ return on(a) && ids[a.game]; }).map(function(a){ return {game:a.game, title:a.title, usd:a.usd, specs:a.specs || [], images:a.images || []}; }),
+    extra:{logoTopup:c.site.logoTopup || '', logoAccount:c.site.logoAccount || '', accent:c.site.accent || '', t:cleanTexts(c.site.t),
+      banners:(c.banners || []).filter(function(b){ return on(b) && b.img; }).map(function(b){ return {img:b.img, game:b.game || '', url:b.url || ''}; })}
+  };
+}
+function fromApi(c){
+  if(c.ui) return normalizeConfig(c.ui);
+  return normalizeConfig({
+    shop:{name:'Julian Topup', telegram:c.telegram || '', rate:c.rate || 4100}, khqr:c.khqr || {},
+    site:{logoTopup:c.logo || '', logoAccount:'', accent:'', t:{}},
+    banners:c.banner ? [{id:'b1', img:c.banner, game:'', url:'', on:true}] : [],
+    pays:(c.pays || []).map(function(p, i){ return {id:slug(p.name) || ('p' + i), name:p.name, desc:p.desc || '', mono:p.mono || '', tint:p.tint || '#3355F5', img:p.img || '', on:true}; }),
+    games:(c.games || []).map(function(g){ g = clone(g); g.on = true; g.packs = (g.packs || []).map(function(p){ return {a:p[0], p:p[1], img:p[2] || ''}; }); return g; }),
+    accounts:(c.accounts || []).map(function(a){ a = clone(a); a.on = true; return a; })
+  });
+}
+function fromApiOrder(o){
+  var acc = o.kind === 'account', pk = String(o.packText || '').match(/^([\d,.]+)\s*(.*)$/);
+  var log = [{s:'pending', t:o.createdAt}];
+  if(o.paidAt) log.push({s:'paid', t:o.paidAt});
+  if(o.completedAt) log.push({s:'delivered', t:o.completedAt});
+  return {id:o.code, kind:o.kind, gameId:o.game || '', gameName:o.gameName || (acc ? 'គណនីហ្គេម' : 'ផ្សេងៗ'), region:'', unit:pk ? pk[2] : '',
+    idLabel:'Player ID', pid:acc ? (o.phone || '') : (o.pid || ''), sid:o.sid || '', amount:acc ? 1 : (pk ? Number(pk[1].replace(/,/g, '')) : 0),
+    usd:o.usd, method:o.pay || 'KHQR', status:o.status === 'completed' ? 'delivered' : o.status, customer:o.name || '',
+    note:acc ? (o.item + (o.note ? ' · ' + o.note : '')) : (o.note || ''), createdAt:o.createdAt, updatedAt:o.completedAt || o.paidAt || o.createdAt, log:log};
+}
+function toApiOrder(o){
+  var gn = o.gameName + (o.region ? ' ' + o.region : '');
+  return {code:o.id, kind:o.kind, game:o.gameId, gameName:gn, pid:o.pid, sid:o.sid, packText:o.amount + ' ' + o.unit,
+    item:gn + ' · ' + o.amount + ' ' + o.unit, usd:o.usd, pay:o.method, status:o.status === 'delivered' ? 'completed' : o.status,
+    name:o.customer, note:o.note, createdAt:o.createdAt};
+}
+function makeServerStore(){
+  function loadOrders(){ return api('orders').then(function(r){ S.orders = (r.orders || []).map(fromApiOrder); sortOrders(); }); }
+  return {
+    init:function(done){
+      Promise.all([api('getConfig'), loadOrders()]).then(function(r){
+        S.cfg = fromApi(r[0].config); done();
+        setInterval(function(){
+          if(document.hidden || S.sheet || (S.tab !== 'orders' && S.tab !== 'dash')) return;
+          loadOrders().then(function(){ renderAll(true); }, function(){});
+        }, 30000);
+      }, function(e){ if(!token || (e && e.code === 'unauthorized')) showLogin(); else { $('#boot').hidden = true; $('#login').hidden = true; $('#app').hidden = false; toast((e && e.msg) || 'តភ្ជាប់ Server មិនបាន', true); renderAll(); } });
+    },
+    saveConfig:function(cfg){
+      var c = clone(cfg);
+      return uploadAll(c).then(function(){ return api('saveConfig', {config:toApi(c), ui:c}); }).then(function(){ S.cfg = normalizeConfig(c); });
+    },
+    saveOrder:function(o){
+      if(/^DEMO-/.test(o.id)) return Promise.reject({msg:'មិនអាចរក្សាទុកទិន្នន័យគំរូលើ Server បានទេ'});
+      return api('putOrder', toApiOrder(o)).then(function(){
+        var i = S.orders.findIndex(function(x){ return x.id === o.id; });
+        if(i >= 0) S.orders[i] = clone(o); else S.orders.push(clone(o));
+        sortOrders();
+      });
+    },
+    deleteOrder:function(id){
+      return api('deleteOrder', {code:id}).then(function(){ S.orders = S.orders.filter(function(x){ return x.id !== id; }); });
+    }
+  };
+}
+function startServer(){
+  S.mode = 'server'; store = makeServerStore();
+  $('#login').hidden = true; $('#boot').hidden = false;
+  store.init(function(){ $('#login').hidden = true; ready(); });
+}
+function doLogin(){
+  var pw = $('#lg-pw').value; $('#lg-err').textContent = '';
+  if(!pw) return;
+  $('#lg-go').disabled = true;
+  api('login', {password:pw}).then(function(r){
+    token = r.token; try{ sessionStorage.setItem(TOKEN_KEY, token); }catch(e){}
+    $('#lg-pw').value = ''; $('#lg-go').disabled = false;
+    if(S.mode === 'server' && store){ $('#login').hidden = true; $('#app').hidden = false; api('orders').then(function(r2){ S.orders = (r2.orders || []).map(fromApiOrder); sortOrders(); renderAll(true); }, function(){}); }
+    else startServer();
+  }, function(e){ $('#lg-go').disabled = false; $('#lg-err').textContent = (e && e.msg) || 'ចូលមិនបាន'; });
+}
+$('#lg-go').addEventListener('click', doLogin);
+$('#lg-pw').addEventListener('keydown', function(e){ if(e.key === 'Enter') doLogin(); });
+if(token) startServer(); else showLogin();
+
+})();
+</script>
+</body>
+</html>
